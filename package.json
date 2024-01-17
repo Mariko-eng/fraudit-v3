@@ -10,14 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.15.4",
     "@tanstack/react-query": "^5.17.9",
     "@tanstack/react-query-devtools": "^5.17.9",
+    "@tanstack/react-table": "^8.11.6",
+    "@types/react-table": "^7.7.19",
+    "date-fns": "^1.30.1",
     "flowbite": "^2.2.1",
     "flowbite-react": "^0.7.2",
+    "json-server": "^1.0.0-alpha.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
-    "react-router-dom": "^6.21.1"
+    "react-router-dom": "^6.21.1",
+    "regenerator-runtime": "^0.14.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

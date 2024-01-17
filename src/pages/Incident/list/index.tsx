@@ -1,6 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getIncidents } from "../../../utils/incidents";
 import { posIncident } from "../../../utils/incidents";
+import BasicTable from "../../../components/react_table/BasicTable";
+// import SortingTable from "../../../components/react_table/SortingTable";
+// import FilteringTable from "../../../components/react_table/FilteringTable";
+// import PaginationTable from "../../../components/react_table/paginationTable";
+
+// const columns = [
+//   { title: "Data ID", field: "id" },
+//   { title: "Title", field: "title" },
+// ];
+
 
 function IncidentList() {
   const queryClient = useQueryClient();
@@ -92,17 +102,17 @@ function IncidentList() {
 
       <div className="flex justify-end my-2">
         <button
-        onClick={() =>
-          incidentMutation.mutate({
-            id: "new",
-            category: "new category",
-            sub_category: "new sub category",
-            description: "new description",
-          })
-        }
-      >
-        Add Incident
-      </button>
+          onClick={() =>
+            incidentMutation.mutate({
+              id: "new",
+              category: "new category",
+              sub_category: "new sub category",
+              description: "new description",
+            })
+          }
+        >
+          Add Incident
+        </button>
       </div>
 
       <div>
@@ -111,11 +121,17 @@ function IncidentList() {
         ) : incidentsQuery.isError ? (
           <div>Error</div>
         ) : (
-          <div>{incidentsQuery.data?.map((item, index) => 
-          <div key={index}>
-            { item.category }
-          </div>)}</div>
+          <div>
+            {incidentsQuery.data?.map((item, index) => (
+              <div key={index}>{item.category}</div>
+            ))}
+          </div>
         )}
+      </div>
+
+      <div>
+        <BasicTable />
+        {/* <PaginationTable /> */}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getIncidents } from "../../../utils/incidents";
-import { posIncident } from "../../../utils/incidents";
+// import { posIncident } from "../../../utils/incidents";
 import BasicTable from "../../../components/react_table/BasicTable";
 // import SortingTable from "../../../components/react_table/SortingTable";
 // import FilteringTable from "../../../components/react_table/FilteringTable";
@@ -11,6 +11,20 @@ import BasicTable from "../../../components/react_table/BasicTable";
 //   { title: "Title", field: "title" },
 // ];
 
+const posIncident = async (data: {
+  id: string;
+  category: string;
+  sub_category: string;
+  description: string;
+}) => {
+  console.log(data);
+  try {
+    // incidents.push(data);
+    return Promise.resolve([]);
+  } catch (err) {
+    return Promise.reject("Error");
+  }
+};
 
 function IncidentList() {
   const queryClient = useQueryClient();

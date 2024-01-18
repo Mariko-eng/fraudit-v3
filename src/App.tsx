@@ -1,63 +1,81 @@
-import { createBrowserRouter ,RouterProvider } from "react-router-dom"
-import PublicLayout from "./components/layouts/PublicLayout"
-import Protectedlayout from "./components/layouts/ProtectedLayout"
-import PrivateLayout from "./components/layouts/PrivateLayout"
-import IncidentList from "./pages/Incident/list"
-import Dashboard from "./pages/Dashboard"
-import Login from "./pages/Login"
-import IncidentDetail from "./pages/Incident/detail"
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import PublicLayout from "./components/layouts/PublicLayout";
+import Protectedlayout from "./components/layouts/ProtectedLayout";
+import PrivateLayout from "./components/layouts/PrivateLayout";
+import IncidentList from "./pages/Incident/list";
+import Dashboard from "./pages/Dashboard";
+import IncidentDetail from "./pages/Incident/detail";
+import Login from "./pages/Auth/Login";
+import OTPVerification from "./pages/Auth/OTP";
+import ProtectedOtpLayout from "./components/layouts/ProtectedOtpLayout";
 
 const App = () => {
-
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Protectedlayout/>,
+      element: <Protectedlayout />,
       children: [
         {
           path: "",
-          element: <Login/>}
-      ]
+          element: <Login />,
+        },
+        {
+          path: "login",
+          element: <Login />,
+        },
+      ],
+    },
+    {
+      path: "otp/verify",
+      element: <ProtectedOtpLayout />,
+      children: [
+        {
+          path: "",
+          element: <OTPVerification />,
+        },
+      ],
     },
     {
       path: "about-us",
-      element: <PublicLayout/>,
+      element: <PublicLayout />,
       children: [
         {
           path: "",
-          element: <>About Us</>}
-      ]
+          element: <>About Us</>,
+        },
+      ],
     },
     {
       path: "faq",
-      element: <PublicLayout/>,
+      element: <PublicLayout />,
       children: [
         {
           path: "",
-          element: <>About Us</>}
-      ]
+          element: <>About Us</>,
+        },
+      ],
     },
     {
       path: "home",
-      element: <PrivateLayout/>,
+      element: <PrivateLayout />,
       children: [
         {
           path: "",
-          element: <Dashboard/>},
+          element: <Dashboard />,
+        },
         {
           path: "incidents",
-          element: <IncidentList/>
+          element: <IncidentList />,
         },
         {
           path: "incidents/:id",
-          element: <IncidentDetail/>
-        }
-      ]
-    }
-  ])
+          element: <IncidentDetail />,
+        },
+      ],
+    },
+  ]);
 
-  return <RouterProvider router={router} />
+  return <RouterProvider router={router} />;
+};
 
-}
-
-export default App
+export default App;

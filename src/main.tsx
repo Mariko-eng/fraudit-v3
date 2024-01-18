@@ -1,4 +1,7 @@
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from 'react-helmet-async';
+import { Provider } from 'react-redux';
+import { store } from './redux';
 import App from "./App.tsx";
 import("flowbite");
 import 'regenerator-runtime'
@@ -22,6 +25,10 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+    <HelmetProvider>
     <App />
+    </HelmetProvider>
+    </Provider>
   </QueryClientProvider>
 );

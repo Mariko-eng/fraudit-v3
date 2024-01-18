@@ -1,0 +1,3 @@
+ 
+POST http://127.0.0.1:8000/api/users/otp/send_email/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA1NjcwMjM0LCJpYXQiOjE3MDU1ODM4MzQsImp0aSI6IjkxNjllYjQwNmU2ZjQyZDNhNTljNDNmMWE3NjZiOTdhIiwidXNlcl9pZCI6ImI4NmM1YWYwLWMyMzUtNDcwMy05ZWUyLWEwY2E5MmM3MDk4OSJ9.21kK5Jcak1-xrBFVmPajC_zUPsWl1x7nUS_xAW1sFpc

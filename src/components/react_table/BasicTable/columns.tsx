@@ -37,6 +37,7 @@ export const COLUMNS = [
   columnHelper.accessor("first_name", {
     id: "fname",
     header: () => "F Name",
+    enableSorting:false,
     cell: (props) => <EditableCell props={props}/>,
   }),
 
@@ -75,3 +76,4 @@ export const COLUMNS = [
     // cell: props => <RowActions row={props.row} />,
   }),
 ];
+

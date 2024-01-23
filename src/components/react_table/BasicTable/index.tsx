@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { TbArrowsSort } from "react-icons/tb";
 import {
   PaginationState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import MOCK_DATA from "./../../../constants/sample_data/mock_data.json";
@@ -37,6 +39,7 @@ const getData = async (search: string) => {
 };
 
 const BasicTable = () => {
+
   const columns = useMemo(() => COLUMNS, []);
 
   const [searchParams, setSearchParams] = useState<string>("");
@@ -62,6 +65,7 @@ const BasicTable = () => {
       pagination: pagination,
     },
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     meta: {
       updateData: async () => {
@@ -120,12 +124,24 @@ const BasicTable = () => {
                 <th
                   colSpan={headerItem.colSpan}
                   key={headerItem.id}
-                  className="px-4 py-3"
+                  className="px-3 py-3"
                 >
-                  {flexRender(
-                    headerItem.column.columnDef.header,
-                    headerItem.getContext()
-                  )}
+                  <div className="flex items-center justify-center">
+                    {flexRender(
+                      headerItem.column.columnDef.header,
+                      headerItem.getContext()
+                    )}
+                    {headerItem.column.getCanSort() && (
+                      <TbArrowsSort
+                        className="ml-1"
+                        onClick={
+                          () => {
+                            headerItem.column.toggleSorting()
+                        }
+                        }
+                      />
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
@@ -135,7 +151,7 @@ const BasicTable = () => {
           {rowModel.rows.map((row) => (
             <tr key={row.id} className="border-b dark:border-gray-700">
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
+                <td key={cell.id} className="px-3 py-3">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -156,7 +172,7 @@ const BasicTable = () => {
         </p>
         <div className="flex">
           <select
-          style={{width : "110px", height:"30px"}}
+            style={{ width: "110px", height: "30px" }}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={pagination.pageSize}
             onChange={(e) => {

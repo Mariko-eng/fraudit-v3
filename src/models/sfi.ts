@@ -7,13 +7,13 @@ export interface SfiModel {
 
   unique_number: string;
 
-  is_active?: boolean | undefined;
+  is_active: boolean | undefined;
 
   sfitrail_set?: any[] | undefined;
 
   updated_at?: Date | string | undefined;
 
-//   created_by?: User | object | undefined;
+  // created_by?: User | object | undefined;
 
-  created_at?: Date | string | undefined;
+  created_at: Date | string | undefined;
 }

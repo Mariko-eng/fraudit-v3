@@ -20,7 +20,6 @@ const Login = () => {
   }, [dispatch]);
 
   const handleLogin = async (data: { email: string; password: string }) => {
-    console.log(data);
     try {
       await dispatch(loginUser({ email: data.email, password: data.password }));
 
@@ -64,8 +63,8 @@ const Login = () => {
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
       loginMutation.mutate({
         email: values.email,
         password: values.password,

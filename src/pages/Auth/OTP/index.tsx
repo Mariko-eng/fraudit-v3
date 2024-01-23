@@ -1,10 +1,11 @@
 import { SyntheticEvent, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import AuthService from "../../../services/auth.service";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CustomError } from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../../../redux/reducers/auth";
 
 export interface QueryTypes {
   isError?: boolean;
@@ -20,9 +21,11 @@ const OTPVerification = () => {
 
   const state = useAppSelector((store) => store.auth);
 
+  const dispatch = useAppDispatch();
+
   const [oTPError, setOTPError] = useState<boolean>(false);
 
-  const [ otpCode, setOtpCode ] = useState("")
+  const [otpCode, setOtpCode] = useState("");
 
   const { isError, isLoading, isSuccess, error }: QueryTypes = useQuery({
     queryKey: [],
@@ -120,31 +123,49 @@ const OTPVerification = () => {
     if (isError) {
       return (
         <>
-          <div
-            className="bg-red-50 border border-red-200 rounded-md p-4 mb-3"
-            role="alert"
-          >
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-4 w-4 text-yellow-400 mt-0.5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm text-yellow-800 font-semibold">
-                  OTP Error
-                </h3>
-                <div className="mt-1 text-sm text-yellow-700">
-                  {error.errorMessage}
+          <div>
+            <div
+              className="bg-red-50 border border-red-200 rounded-md p-4 mb-3"
+              role="alert"
+            >
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-4 w-4 text-yellow-400 mt-0.5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-sm text-yellow-800 font-semibold">
+                    OTP Error
+                  </h3>
+                  <div className="mt-1 text-sm text-yellow-700">
+                    {error.errorMessage
+                      ? error.message
+                      : "Something went Wrong! Failed to send OTP"}
+                  </div>
                 </div>
               </div>
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="mt-2 text-sm text-[#00AFD7]"
+                onClick={() => dispatch(logoutUser())}
+              >
+                Login Again
+              </button>
+              <button
+                className="mt-2 text-sm text-emerald-700"
+                onClick={() => window.location.reload()}
+              >
+                Resend Otp
+              </button>
             </div>
           </div>
         </>
@@ -270,7 +291,7 @@ const OTPVerification = () => {
               <div className="p-4 sm:p-7">
                 <div className="text-center">
                   <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                    Verification Code
+                    OTP Verification Code
                   </h1>
                 </div>
 

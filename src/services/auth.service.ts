@@ -1,7 +1,8 @@
-import { API } from "../utils/api";
+import { UserModel } from "../models/user";
+import { APIAUTH } from "../utils/api";
 
 const login = (email: string, password: string) => {
-  return API.post("users/token/login/", {
+  return APIAUTH.post("/api/users/token/login/", {
     email,
     password,
   }).then((response) => {
@@ -20,14 +21,19 @@ const login = (email: string, password: string) => {
 };
 
 const requestOtp = (data: object, headers: object) => {
-
-  return API.post("users/otp/send_email/", data, { headers: headers }).then((response) => {
+  return APIAUTH.post("/api/users/otp/send_email/", data, { headers: headers }).then((response) => {
+    const user = localStorage.getItem("user");
+    if (user){
+      const obj = JSON.parse(user) as UserModel;
+      obj.is_otp_verified = true
+      localStorage.setItem("user", JSON.stringify(obj));
+    }
     return response.data;
   });
 };
 
 const verifyOtp = (data: object, headers: object) => {
-  return API.post("users/otp/verify/", data, { headers: headers }).then((response) => {
+  return APIAUTH.post("/api/users/otp/verify/", data, { headers: headers }).then((response) => {
     return response.data;
   });
 };
@@ -35,7 +41,7 @@ const verifyOtp = (data: object, headers: object) => {
 const logout = () => {
   localStorage.clear()
   // localStorage.removeItem("user");
-  // return API.post("users/token/blacklist/").then((response) => {
+  // return API.post("/api/users/token/blacklist/").then((response) => {
   //   return response.data;
   // });
 };
@@ -51,7 +57,7 @@ const getCurrentUser = () => {
 };
 
 const register = (username: string, email: string, password: string) => {
-  return API.post("signup", {
+  return APIAUTH.post("signup", {
     username,
     email,
     password,

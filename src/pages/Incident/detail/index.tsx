@@ -1,11 +1,46 @@
+import { useQuery } from "@tanstack/react-query";
 import { Tabs } from "flowbite-react";
 import { HiArchive, HiFolder, HiUserCircle } from "react-icons/hi";
 import { useParams } from "react-router";
+import IncidentService from "../../../services/incident.service";
+import { useAppSelector } from "../../../redux/hooks";
+import { useEffect, useState } from "react";
+import { IncidentModel } from "../../../models/incident";
 
 const IncidentDetail = () => {
   const params = useParams();
 
-  console.log(params);
+  const { id } = params;
+  const incidentId = id;
+
+  const state = useAppSelector((store) => store.auth);
+
+  const [incident, setIncident] = useState<IncidentModel | null>(null);
+
+  const incidentQuery = useQuery({
+    queryKey: ["incident", incidentId],
+    queryFn: async () => {
+      // Check if incidentId is defined before making the API call
+      if (incidentId) {
+        return await IncidentService.getIncidentById(incidentId, {
+          Authorization: `Bearer ${state.tokens?.access}`,
+        });
+      } else {
+        // Handle the case where incidentId is undefined (e.g., redirect or display an error)
+        throw new Error("Incident ID is undefined");
+      }
+    },
+  });
+
+  // console.log(incidentQuery)
+
+  useEffect(() => {
+    if (incidentQuery.isSuccess) {
+      const data: IncidentModel = incidentQuery.data as IncidentModel;
+
+      setIncident(data);
+    }
+  }, [incidentQuery]);
 
   return (
     <div>
@@ -75,40 +110,44 @@ const IncidentDetail = () => {
           </ol>
         </nav>
       </div>
-      <div>
-        <Tabs aria-label="Tabs with icons" style="underline">
-          <Tabs.Item active title="Incident Data" icon={HiFolder}>
-            This is{" "}
-            <span className="font-medium text-gray-800 dark:text-white">
-              Profile tab's associated content
-            </span>
-            . Clicking another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </Tabs.Item>
-          <Tabs.Item title="Uploaded Files" icon={HiArchive}>
-            This is{" "}
-            <span className="font-medium text-gray-800 dark:text-white">
-              Dashboard tab's associated content
-            </span>
-            . Clicking another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </Tabs.Item>
-          <Tabs.Item title="Involved Individuals" icon={HiUserCircle}>
-            This is{" "}
-            <span className="font-medium text-gray-800 dark:text-white">
-              Settings tab's associated content
-            </span>
-            . Clicking another tab will toggle the visibility of this one for
-            the next. The tab JavaScript swaps classes to control the content
-            visibility and styling.
-          </Tabs.Item>
-          <Tabs.Item disabled title="Disabled">
-            Disabled content
-          </Tabs.Item>
-        </Tabs>
-      </div>
+      {incidentQuery.isLoading ? (
+        <div className="text-yellow-400">Loading</div>
+      ) : incidentQuery.isError ? (
+        <div className="text-red-400">Something Went Wrong!</div>
+      ) : incidentQuery.isSuccess ? (
+        <div>
+          <Tabs aria-label="Tabs with icons" style="underline">
+            <Tabs.Item active title="Incident Data" icon={HiFolder}>
+              <div>
+                <p>{incident?.category_name}</p>
+              </div>
+            </Tabs.Item>
+            <Tabs.Item title="Uploaded Files" icon={HiArchive}>
+              This is{" "}
+              <span className="font-medium text-gray-800 dark:text-white">
+                Dashboard tab's associated content
+              </span>
+              . Clicking another tab will toggle the visibility of this one for
+              the next. The tab JavaScript swaps classes to control the content
+              visibility and styling.
+            </Tabs.Item>
+            <Tabs.Item title="Suspects" icon={HiUserCircle}>
+              This is{" "}
+              <span className="font-medium text-gray-800 dark:text-white">
+                Settings tab's associated content
+              </span>
+              . Clicking another tab will toggle the visibility of this one for
+              the next. The tab JavaScript swaps classes to control the content
+              visibility and styling.
+            </Tabs.Item>
+            <Tabs.Item disabled title="Disabled">
+              Disabled content
+            </Tabs.Item>
+          </Tabs>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

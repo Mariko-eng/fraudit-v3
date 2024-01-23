@@ -1,24 +1,39 @@
-import  { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { BsPlusCircleFill } from "react-icons/bs";
 
-const TableHeader = ({
+const IncidentTableHeader = ({
+  totalNo,
   searchParams,
   handleSearch,
 }: {
+  totalNo: number;
   searchParams: string;
   handleSearch: (value: string) => void;
 }) => {
-
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
     handleSearch(event.target.value);
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
-      <div className="w-full md:flex-row flex justify-end" >
-          <button className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center"><span className="mx-1"><BsPlusCircleFill/></span>Add New</button>
-        </div>
+    <div className="bg-white dark:bg-gray-800 relative sm:rounded-lg">
+      {/* <div className="w-full md:flex-row flex justify-between">
+        <h5 className="mx-3 my-2">
+          All Incidents :<span className="ml-1 font-medium">{totalNo}</span>
+        </h5>
+      </div> */}
+      <div className="w-full my-2 md:flex-row flex justify-between items-center">
+        <h5 className="mx-3 text-gray-500">
+          All Incidents :<span className="ml-1 text-black font-medium">{totalNo}</span>
+        </h5>
+        <button className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center">
+          <span className="mx-1">
+            <BsPlusCircleFill />
+          </span>
+          New Incident
+        </button>
+      </div>
+      <hr />
+
       <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="w-full md:w-1/2">
           <form className="flex items-center">
@@ -267,4 +282,4 @@ const TableHeader = ({
   );
 };
 
-export default TableHeader;
+export default IncidentTableHeader;

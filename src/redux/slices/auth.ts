@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser, logoutUser } from "./../reducers/auth"; // Adjust the import path
+import { loginUser ,logoutUser } from "./../reducers/auth"; // Adjust the import path
 import { AuthTokenModel, AuthUserModel } from "../../models/auth";
 
 const getUser = (): AuthUserModel | null => {
-      const userString = localStorage.getItem("user");
+  const userString = localStorage.getItem("user");
 
   if (userString === null) {
     return null; // or handle the case where "user" is not in localStorage
-  }else{
+  } else {
     return JSON.parse(userString) as AuthUserModel;
   }
 };
@@ -17,22 +17,32 @@ const getTokens = (): AuthTokenModel | null => {
 
   if (tokenString === null) {
     return null; // or handle the case where "user" is not in localStorage
-  }else{
+  } else {
     return JSON.parse(tokenString) as AuthTokenModel;
   }
 };
 
-
 export interface AuthState {
-  isLoading: boolean,
-  isLoggedIn: boolean,
-  tokens: AuthTokenModel | null,
-  user: AuthUserModel | null
+  isLoading: boolean;
+  isLoggedIn: boolean;
+  tokens: AuthTokenModel | null;
+  user: AuthUserModel | null;
 }
 
-const initialState : AuthState = {
-  isLoading: false, isLoggedIn: true, tokens : getTokens(), user: getUser()
-}
+const initialState: AuthState =
+  getUser() && getTokens()
+    ? {
+        isLoading: false,
+        isLoggedIn: true,
+        tokens: getTokens(),
+        user: getUser(),
+      }
+    : {
+        isLoading: false,
+        isLoggedIn: false,
+        tokens: null,
+        user: null,
+      };
 
 // const initialState : AuthState = getUser()
 //   ? { isLoading: false, isLoggedIn: true, user : user() }

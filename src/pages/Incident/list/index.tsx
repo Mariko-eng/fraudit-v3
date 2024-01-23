@@ -1,49 +1,116 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getIncidents } from "../../../utils/incidents";
-// import { posIncident } from "../../../utils/incidents";
-import BasicTable from "../../../components/react_table/BasicTable";
-// import SortingTable from "../../../components/react_table/SortingTable";
-// import FilteringTable from "../../../components/react_table/FilteringTable";
-// import PaginationTable from "../../../components/react_table/paginationTable";
-
-// const columns = [
-//   { title: "Data ID", field: "id" },
-//   { title: "Title", field: "title" },
-// ];
-
-const posIncident = async (data: {
-  id: string;
-  category: string;
-  sub_category: string;
-  description: string;
-}) => {
-  console.log(data);
-  try {
-    // incidents.push(data);
-    return Promise.resolve([]);
-  } catch (err) {
-    return Promise.reject("Error");
-  }
-};
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import IncidentService from "../../../services/incident.service";
+import { useCallback, useState } from "react";
+import { useAppSelector } from "../../../redux/hooks";
+import { IncidentListModel, IncidentModel } from "../../../models/incident";
+import { useEffect, useMemo } from "react";
+import { TbArrowsSort } from "react-icons/tb";
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { INCIDENTCOLUMNS } from "../columns";
+import IncidentTableHeader from "../header";
 
 function IncidentList() {
+  const state = useAppSelector((store) => store.auth);
+
+  const [tableData, setTableData] = useState<IncidentModel[]>([]);
+
   const queryClient = useQueryClient();
 
+  const [searchParams, setSearchParams] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const incidentsQuery = useQuery({
-    queryKey: ["incidents"],
-    queryFn: getIncidents,
+    queryKey: ["incidents", currentPage], // Include searchParams in the queryKey
+    initialData: {},
+    queryFn: async () =>
+      await IncidentService.getIncidents(
+        {
+          page: currentPage,
+        },
+        {
+          Authorization: `Bearer ${state.tokens?.access}`,
+        }
+      ),
   });
 
-  const incidentMutation = useMutation({
-    onMutate() {
-      // console.log(variables);
-    },
-    mutationFn: posIncident,
-    onSuccess: () => {
-      // console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["incidents"] });
-    },
+  const incidentsSearchQuery = useQuery({
+    queryKey: ["incidentSearch", searchParams, currentPage], // Include searchParams in the queryKey
+    initialData: {},
+    queryFn: async () =>
+      await IncidentService.getIncidents(
+        {
+          search: searchParams,
+          page: currentPage,
+          // page_size: currentPageSize,
+        },
+        {
+          Authorization: `Bearer ${state.tokens?.access}`,
+        }
+      ),
+    enabled: searchParams.trim() !== "",
   });
+
+  useEffect(() => {
+    if (searchParams.trim() === "") {
+      const incidentData: IncidentListModel =
+        incidentsQuery.data as IncidentListModel;
+
+      setTableData(incidentData.results);
+    } else {
+      const incidentData: IncidentListModel =
+        incidentsSearchQuery.data as IncidentListModel;
+
+      setTableData(incidentData.results);
+    }
+  }, [
+    searchParams,
+    incidentsQuery.data,
+    incidentsSearchQuery.data,
+    setTableData,
+  ]);
+
+  const [columns, data] = useMemo(() => {
+    if (tableData !== undefined) {
+      return [INCIDENTCOLUMNS, tableData];
+    }
+    return [INCIDENTCOLUMNS, []];
+  }, [tableData]);
+
+  // console.log(incidentsQuery.data)
+
+  const handleSearch = (value: string) => {
+    setSearchParams(value);
+  };
+
+  const handleFilter = useCallback(() => {
+    queryClient.refetchQueries({
+      queryKey: ["incidentSearch", searchParams, currentPage],
+    });
+  }, [queryClient, searchParams, currentPage]);
+
+  useEffect(() => {
+    if (searchParams.trim() !== "") {
+      handleFilter();
+    }
+  }, [searchParams, currentPage, handleFilter]);
+
+  const tableInstance = useReactTable({
+    columns,
+    data: data || [],
+    state: {},
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  const headerGroups = tableInstance.getHeaderGroups();
+
+  const rowModel = tableInstance.getRowModel();
 
   return (
     <div>
@@ -84,7 +151,7 @@ function IncidentList() {
                   href="#"
                   className="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white"
                 >
-                  Incident
+                  Incidents
                 </a>
               </div>
             </li>
@@ -106,7 +173,7 @@ function IncidentList() {
                   className="ml-1 text-gray-400 md:ml-2 dark:text-gray-500"
                   aria-current="page"
                 >
-                  Details
+                  List
                 </span>
               </div>
             </li>
@@ -114,38 +181,125 @@ function IncidentList() {
         </nav>
       </div>
 
-      <div className="flex justify-end my-2">
-        <button
-          onClick={() =>
-            incidentMutation.mutate({
-              id: "new",
-              category: "new category",
-              sub_category: "new sub category",
-              description: "new description",
-            })
-          }
-        >
-          Add Incident
-        </button>
-      </div>
-
       <div>
-        {incidentsQuery.isLoading ? (
-          <div>Loading...</div>
-        ) : incidentsQuery.isError ? (
-          <div>Error</div>
-        ) : (
-          <div>
-            {incidentsQuery.data?.map((item, index) => (
-              <div key={index}>{item.category}</div>
-            ))}
+        {incidentsQuery.data ? (
+          <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
+            <IncidentTableHeader
+              totalNo={incidentsQuery.data.count ? incidentsQuery.data.count : 0}
+              searchParams={searchParams}
+              handleSearch={handleSearch}
+            />
+
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  {headerGroups.map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((headerItem) => (
+                        <th
+                          colSpan={headerItem.colSpan}
+                          key={headerItem.id}
+                          className="w-5 p-4"
+                        >
+                          <div className="flex items-start justify-center">
+                            {flexRender(
+                              headerItem.column.columnDef.header,
+                              headerItem.getContext()
+                            )}
+                            {headerItem.column.getCanSort() && (
+                              <TbArrowsSort
+                                className="ml-1"
+                                onClick={() => {
+                                  headerItem.column.toggleSorting();
+                                }}
+                              />
+                            )}
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {rowModel.rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="w-5 p-4 items-center">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></tfoot>
+              </table>
+            </div>
+
+            <br />
+            <div>
+              <p>
+                Page{" "}
+                <span>
+                  {currentPage} of {""} {incidentsQuery.data.total}
+                </span>
+              </p>
+              <nav aria-label="Page navigation example">
+                <ul className="inline-flex -space-x-px text-sm">
+                  <li>
+                    <button
+                      onClick={() => {
+                        setCurrentPage((prev) => {
+                          if (prev > 1) {
+                            return prev - 1;
+                          } else {
+                            return 1;
+                          }
+                        });
+                      }}
+                      disabled={incidentsQuery.data.previous === null}
+                      className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  {[...Array(incidentsQuery.data.total).keys()].map((index) => (
+                    <li key={index}>
+                      <button
+                        onClick={() => {
+                          setCurrentPage(index + 1);
+                        }}
+                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      >
+                        {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li>
+                    <button
+                      onClick={() => {
+                        setCurrentPage((prev) => prev + 1);
+                      }}
+                      disabled={incidentsQuery.data.next === null}
+                      className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
+        ) : (
+          <p>Loading....</p>
         )}
-      </div>
 
-      <div>
-        <BasicTable />
-        {/* <PaginationTable /> */}
+        {/* <BasicTable /> */}
       </div>
     </div>
   );

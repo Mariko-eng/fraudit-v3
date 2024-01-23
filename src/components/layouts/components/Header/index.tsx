@@ -1,14 +1,15 @@
-import { useAppDispatch } from "../../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { logoutUser } from "../../../../redux/reducers/auth";
+import { toggleSidebar } from "../../../../redux/slices/sidebar";
 import Logo from "./../../../../assets/UBALogoOnlyLight.png";
 
-interface HeaderProps {
-  toggleSidebar: () => void;
-}
 
-const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
-  const dispatch =  useAppDispatch();
+const Header = () => {
+
+  const sidebar = useAppSelector((store) => store.sidebar);
+
+  const dispatch = useAppDispatch();
 
   return (
     <>
@@ -23,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 data-hs-overlay="#application-sidebar"
                 aria-controls="application-sidebar"
                 aria-label="Toggle navigation"
-                onClick={toggleSidebar}
+                onClick={() => dispatch(toggleSidebar(!sidebar.isOpen))}
               >
                 <svg
                   id="toggleSidebarMobileHamburger"
@@ -296,7 +297,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 </div>
               </div>
               {/*<!-- ========== New  ========== -->*/}
-                <div className="flex items-center ml-3">
+              <div className="flex items-center ml-3">
                 <div>
                   <button
                     type="button"
@@ -343,8 +344,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                     </li>
                     <li>
                       <a
-                      onClick={() => dispatch(logoutUser())}
-                        // href="#"
+                        onClick={() => dispatch(logoutUser())}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                         role="menuitem"
                       >
@@ -354,7 +354,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   </ul>
                 </div>
               </div>
-
             </div>
           </div>
         </div>

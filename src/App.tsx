@@ -8,6 +8,8 @@ import IncidentDetail from "./pages/Incident/detail";
 import Login from "./pages/Auth/Login";
 import OTPVerification from "./pages/Auth/OTP";
 import ProtectedOtpLayout from "./components/layouts/ProtectedOtpLayout";
+import UserList from "./pages/User/list";
+import UserDetail from "./pages/User/detail";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -70,6 +72,14 @@ const App = () => {
         {
           path: "incidents/:id",
           element: <IncidentDetail />,
+        },
+        {
+          path: "users",
+          element: <UserList />,
+        },
+        {
+          path: "users/:id",
+          element: <UserDetail />,
         },
       ],
     },

@@ -1,27 +1,20 @@
 import { API } from "../utils/api";
 
-const getPublicContent = () => {
-  return API.get("/all");
+const getUsers = (params: object, headers: object) => {
+
+  // Convert params object to a query string
+  const queryString = Object.entries(params)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join('&');
+
+  return API.get(`/api/users/list/?${queryString}`, { headers: headers }).then((response) => {
+    return response.data;
+  });
 };
 
-const getUserBoard = () => {
-  return API.get("/user");
-};
-
-const getModeratorBoard = () => {
-  return API.get("/mod");
-};
-
-
-const getAdminBoard = () => {
-  return API.get("/admin");
-};
 
 const UserService = {
-  getPublicContent,
-  getUserBoard,
-  getModeratorBoard,
-  getAdminBoard,
+  getUsers,
 }
 
 export default UserService;

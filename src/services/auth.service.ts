@@ -22,18 +22,18 @@ const login = (email: string, password: string) => {
 
 const requestOtp = (data: object, headers: object) => {
   return APIAUTH.post("/api/users/otp/send_email/", data, { headers: headers }).then((response) => {
-    const user = localStorage.getItem("user");
-    if (user){
-      const obj = JSON.parse(user) as UserModel;
-      obj.is_otp_verified = true
-      localStorage.setItem("user", JSON.stringify(obj));
-    }
     return response.data;
   });
 };
 
 const verifyOtp = (data: object, headers: object) => {
   return APIAUTH.post("/api/users/otp/verify/", data, { headers: headers }).then((response) => {
+        const user = localStorage.getItem("user");
+    if (user){
+      const obj = JSON.parse(user) as UserModel;
+      obj.is_otp_verified = true
+      localStorage.setItem("user", JSON.stringify(obj));
+    }
     return response.data;
   });
 };

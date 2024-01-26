@@ -10,16 +10,16 @@ export interface CustomError extends AxiosError {
 export const APIAUTH = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
 
@@ -40,7 +40,7 @@ API.interceptors.response.use(
 API.interceptors.request.use(
   async function (config) {
     // Do something before request is sent
-    // console.log(config);
+    console.log(config);
     const tokenString = localStorage.getItem("tokens");
     if (tokenString) {
       try {

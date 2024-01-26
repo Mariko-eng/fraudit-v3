@@ -41,9 +41,9 @@ export interface IncidentModel {
   status: string | undefined;
   is_active: boolean | false;
   sfi: SfiModel | undefined;
-  incidentfile_set: IncidentFileModel[] | undefined;
-  incidentinvolvedindividual_set?: IncidentInvolvedIndividualModel[] | undefined;
-  transferrequest_set?: object[] | undefined;
+  incidentfile_set: IncidentFileModel[] | [];
+  incidentinvolvedindividual_set: IncidentInvolvedIndividualModel[] | [];
+  transferrequest_set: object[] | [];
   updated_at: string | undefined;
   created_by: CreatedByUserModel | string | undefined;
   created_at:  string | undefined;

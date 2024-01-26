@@ -14,16 +14,37 @@ const getIncidents = (params: object, headers: object) => {
 };
 
 const getIncidentById = (id: string, headers: object) => {
-  console.log(id)
 
   return API.get(`/api/incident/retrieve/${id}`, { headers: headers }).then((response) => {
     return response.data;
   });
 };
 
+const addIncident = (data: object, headers: object) => {
+
+  return API.post('/api/incident/add/', data ,{ headers: headers }).then((response) => {
+    return response;
+  });
+};
+
+
+const addFilesToIncident = (data: FormData, token: string) => {
+  return API.post('/api/incident/file/add/', data, {
+    headers: {
+      Authorization: token,
+      "Content-Type": "multipart/form-data",
+    },
+  }).then((response) => {
+    return response;
+  });
+};
+
 const IncidentService = {
   getIncidents,
   getIncidentById,
+  addIncident,
+
+  addFilesToIncident,
 }
 
 export default IncidentService;

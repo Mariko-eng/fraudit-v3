@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import User from "./user_createdby";
 
+import { APIResponseList } from "./apiResponseList";
+
 export interface SfiModel {
   
   id: string;
@@ -16,4 +18,8 @@ export interface SfiModel {
   // created_by?: User | object | undefined;
 
   created_at: Date | string | undefined;
+}
+
+export interface SfiListModel extends APIResponseList {
+    results : SfiModel[]
 }

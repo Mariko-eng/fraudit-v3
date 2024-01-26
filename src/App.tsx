@@ -10,6 +10,8 @@ import OTPVerification from "./pages/Auth/OTP";
 import ProtectedOtpLayout from "./components/layouts/ProtectedOtpLayout";
 import UserList from "./pages/User/list";
 import UserDetail from "./pages/User/detail";
+import NewIncidentUBA from "./pages/Incident/new/NewIncidentUBA";
+import NewIncidentSFI from "./pages/Incident/new/NewIncidentSFI";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -72,6 +74,14 @@ const App = () => {
         {
           path: "incidents/:id",
           element: <IncidentDetail />,
+        },
+        {
+          path: "incidents/sfi/new",
+          element: <NewIncidentSFI />,
+        },
+                {
+          path: "incidents/uba/new",
+          element: <NewIncidentUBA />,
         },
         {
           path: "users",

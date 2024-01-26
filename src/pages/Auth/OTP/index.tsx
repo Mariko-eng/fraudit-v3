@@ -27,7 +27,7 @@ const OTPVerification = () => {
 
   const [otpCode, setOtpCode] = useState("");
 
-  const { isError, isLoading, isSuccess, error }: QueryTypes = useQuery({
+  const { isLoading, isError, isSuccess }: QueryTypes = useQuery({
     queryKey: [],
     queryFn: () =>
       AuthService.requestOtp(
@@ -51,7 +51,9 @@ const OTPVerification = () => {
     onSuccess: () => {
       return navigate("/home");
     },
-    onError: () => {
+    onError: (error) => {
+      console.log(error);
+
       setOTPError(true);
       setTimeout(() => {
         setOTPError(false);
@@ -143,12 +145,22 @@ const OTPVerification = () => {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-sm text-yellow-800 font-semibold">
-                    OTP Error
+                    OTP Verification Error
                   </h3>
                   <div className="mt-1 text-sm text-yellow-700">
-                    {error.errorMessage
-                      ? error.message
-                      : "Something went Wrong! Failed to send OTP"}
+                    {isError ? (
+                      <>Failed To Send OTP Code!</>
+                    ) : otpMutation.isError ? (
+                      <>You have submitted a wrong OTP Code!</>
+                    ) : (
+                      <></>
+                    )}
+
+                    {/* {error.errorMessage
+                ? error.message
+                : otpMutation.error ?
+                otpMutation.error.message
+              : "Something went Wrong! Failed to send OTP"} */}
                   </div>
                 </div>
               </div>
@@ -210,10 +222,16 @@ const OTPVerification = () => {
                       </div>
                       <div className="ml-4">
                         <h3 className="text-sm text-yellow-800 font-semibold">
-                          OTP Error
+                          OTP Verification Error
                         </h3>
                         <div className="mt-1 text-sm text-yellow-700">
-                          {/* {otpMutation.error?.errorMessage} */}
+                          {isError ? (
+                            <>Failed To Send OTP Code!</>
+                          ) : otpMutation.isError ? (
+                            <>You have submitted a wrong OTP Code!</>
+                          ) : (
+                            <></>
+                          )}
                         </div>
                       </div>
                     </div>

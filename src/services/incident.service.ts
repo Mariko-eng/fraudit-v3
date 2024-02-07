@@ -13,12 +13,14 @@ const getIncidents = (params: object, headers: object) => {
   });
 };
 
+
 const getIncidentById = (id: string, headers: object) => {
 
   return API.get(`/api/incident/retrieve/${id}`, { headers: headers }).then((response) => {
     return response.data;
   });
 };
+
 
 const addIncident = (data: object, headers: object) => {
 
@@ -27,9 +29,19 @@ const addIncident = (data: object, headers: object) => {
   });
 };
 
-
 const addFilesToIncident = (data: FormData, token: string) => {
   return API.post('/api/incident/file/add/', data, {
+    headers: {
+      Authorization: token,
+      "Content-Type": "multipart/form-data",
+    },
+  }).then((response) => {
+    return response;
+  });
+};
+
+const addIncidentSuspects = (data: FormData, incidentId: string, token: string) => {
+  return API.put(`/api/incident/involved-individuals/add/${incidentId}/`, data, {
     headers: {
       Authorization: token,
       "Content-Type": "multipart/form-data",
@@ -45,6 +57,7 @@ const IncidentService = {
   addIncident,
 
   addFilesToIncident,
+  addIncidentSuspects,
 }
 
 export default IncidentService;

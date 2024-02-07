@@ -40,7 +40,7 @@ API.interceptors.response.use(
 API.interceptors.request.use(
   async function (config) {
     // Do something before request is sent
-    console.log(config);
+    // console.log(config);
     const tokenString = localStorage.getItem("tokens");
     if (tokenString) {
       try {

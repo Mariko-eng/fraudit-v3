@@ -47,16 +47,13 @@ const AddIncidentFilesModal = ({
 
     if (selectedFile) {
       if (incidentId) {
-        console.log(incidentId)
-        console.log(desc)
-        console.log(selectedFile)
-
         const formData = new FormData();
         formData.append("incident_id", incidentId);
         formData.append("description", desc);
         formData.append("file", selectedFile);
 
         addIncidentFiles(formData);
+        setOpen(false);
       }
     } else {
       // Handle the case where no file is selected

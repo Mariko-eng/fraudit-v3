@@ -15,6 +15,7 @@ import AddIncidentFilesModal from "./components/new_incident_files";
 import { LoadingModal } from "../../../components/modals/messages/LoadingModal";
 import { ErrorModal } from "../../../components/modals/messages/ErrorModal";
 import { SuccessModal } from "../../../components/modals/messages/SuccessModal";
+import { Link } from "react-router-dom";
 
 const IncidentDetail = () => {
   const params = useParams();
@@ -56,21 +57,24 @@ const IncidentDetail = () => {
   }, [incidentQuery]);
 
   const addIncidentFilesMutation = useMutation({
-    mutationFn: ({fileData}: {fileData: FormData}) =>
-      IncidentService.addFilesToIncident(
+    mutationFn: ({fileData}: {fileData: FormData}) => {
+      setOpenAddFiles(false);
+      setOpen(true);
+      return IncidentService.addFilesToIncident(
         fileData,
         `Bearer ${state.tokens?.access}`
         // {
         //   Authorization: `Bearer ${state.tokens?.access}`,
         //   "Content-Type": "multipart/form-data", // Change Content Type
         // }
-      ),
+      )
+    },
     onSuccess: (val) => {
       setOpen(true);
       setTimeout(() => {
         setOpen(false);
-        return val;
       }, 3000);
+      return val;
     },
     onError: (error: CustomError) => {
       console.log(error)
@@ -83,9 +87,6 @@ const IncidentDetail = () => {
   });
 
   const handleAddFiles = (data: FormData) => {
-
-    // console.log(fileData)
-
     addIncidentFilesMutation.mutate({
       fileData: data,
     });
@@ -306,7 +307,9 @@ const IncidentDetail = () => {
                                     Details of the incident.
                                   </p>
                                 </div>
-                                <button
+
+                                <Link
+                                to={`/home/incidents/${incidentId}/suspects-new`}
                                   style={{ height: "40px", width: "150px" }}
                                   className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center"
                                 >
@@ -314,7 +317,7 @@ const IncidentDetail = () => {
                                     <MdEdit />
                                   </span>
                                   Add Suspects
-                                </button>
+                                </Link>
                               </div>
 
                               {incident ? (

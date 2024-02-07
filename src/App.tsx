@@ -12,6 +12,7 @@ import UserList from "./pages/User/list";
 import UserDetail from "./pages/User/detail";
 import NewIncidentUBA from "./pages/Incident/new/NewIncidentUBA";
 import NewIncidentSFI from "./pages/Incident/new/NewIncidentSFI";
+import IncidentSuspectsNew from "./pages/Incident/detail/components/suspects/new";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -74,6 +75,10 @@ const App = () => {
         {
           path: "incidents/:id",
           element: <IncidentDetail />,
+        },
+        {
+          path: "incidents/:id/suspects-new",
+          element: <IncidentSuspectsNew />,
         },
         {
           path: "incidents/sfi/new",

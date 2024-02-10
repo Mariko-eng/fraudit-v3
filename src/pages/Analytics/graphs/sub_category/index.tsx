@@ -1,8 +1,11 @@
-import {useEffect, useState, useMemo} from 'react'
-import { API } from '../../../../utils/api';
-import { useAppSelector } from '../../../../redux/hooks';
-import { SingleSubCategoryResultsModel, SubCategoryStatsModel } from './data_types1';
-import { MultipleSubCategoryResultsModel } from './data_types2';
+import { useEffect, useState, useMemo } from "react";
+import { API } from "../../../../utils/api";
+import { useAppSelector } from "../../../../redux/hooks";
+import {
+  SingleSubCategoryResultsModel,
+  SubCategoryStatsModel,
+} from "./data_types1";
+import { MultipleSubCategoryResultsModel } from "./data_types2";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
@@ -20,33 +23,32 @@ const AnalyticsGraphSubCategory = () => {
   const [error, setError] = useState<string>("");
   const [isSingle, setIsSingle] = useState<boolean | null>(null);
 
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [subCategories, setSubCategories] = useState<SubCategory[]>([])
 
-  const [dataSingle, setDataSingle] = useState<SingleSubCategoryResultsModel | null>(null);
-  const [dataMultiple, setDataMultiple] =useState<MultipleSubCategoryResultsModel | null>(null);
+  const [dataSingle, setDataSingle] =
+    useState<SingleSubCategoryResultsModel | null>(null);
+  const [dataMultiple, setDataMultiple] =
+    useState<MultipleSubCategoryResultsModel | null>(null);
 
   useEffect(() => {
-      const getCategoricalData = async() => {
+    const getCategoricalData = async () => {
+      try {
+        const url = `/api/analytics/sub-categorical-data/list/`;
 
-    try{
-      const url = `/api/analytics/sub-categorical-data/list/`;
+        const response = await API.get(url, {
+          headers: {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          },
+        });
 
-      const response = await API.get(url, {
-        headers: {
-          Authorization: `Bearer ${state.tokens?.access}`,
-        },
-      });
-
-      setSubCategories(response.data as SubCategory[])
-    }
-    catch(e){
-      console.error("Error fetching data:", e);
-    }
-
-  }
-  getCategoricalData()
-  }, [state,setSubCategories])
+        setSubCategories(response.data as SubCategory[]);
+      } catch (e) {
+        console.error("Error fetching data:", e);
+      }
+    };
+    getCategoricalData();
+  }, [state, setSubCategories]);
 
   const getData = async () => {
     setIsLoading(true);
@@ -58,7 +60,7 @@ const AnalyticsGraphSubCategory = () => {
       const params = {
         year: selectedYear,
         month: selectedMonth,
-        sub_category: selectedSubCategory
+        sub_category: selectedSubCategory,
       };
 
       const queryString = Object.entries(params)
@@ -358,8 +360,8 @@ const AnalyticsGraphSubCategory = () => {
   }, [dataSingle]);
 
   return (
-       <>
-        <div className="mb-4 col-span-full xl:mb-2">
+    <>
+      <div className="mb-4 col-span-full xl:mb-2">
         <nav className="flex mb-5" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
             <li className="inline-flex items-center">
@@ -475,7 +477,7 @@ const AnalyticsGraphSubCategory = () => {
               <option value="12">Dec</option>
             </select>
           </div>
-                    <div className="w-full flex items-center justify-center">
+          <div className="w-full flex items-center justify-center">
             <label
               htmlFor="sub_category"
               className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -486,14 +488,14 @@ const AnalyticsGraphSubCategory = () => {
               id="sub_category"
               className="bg-gray-50 mx-1 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               value={selectedSubCategory}
-                onChange={(e) => setSelectedSubCategory(e.target.value)}
-              >
-                <option value="">All</option>
-                {subCategories.map((item, index) => (
-                  <option key={index} value={item.sub_category}>
-                    {item.sub_category}
-                  </option>
-                ))}
+              onChange={(e) => setSelectedSubCategory(e.target.value)}
+            >
+              <option value="">All</option>
+              {subCategories.map((item, index) => (
+                <option key={index} value={item.sub_category}>
+                  {item.sub_category}
+                </option>
+              ))}
             </select>
           </div>
           <div className="w-full flex items-center justify-center">
@@ -507,7 +509,7 @@ const AnalyticsGraphSubCategory = () => {
           </div>
         </div>
 
-                {error && <p>{error}</p>}
+        {error && <p>{error}</p>}
         {!error && (
           <div>
             {isSingle === null ? (
@@ -571,7 +573,7 @@ const AnalyticsGraphSubCategory = () => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default AnalyticsGraphSubCategory
+export default AnalyticsGraphSubCategory;

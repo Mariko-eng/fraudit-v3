@@ -1,40 +1,19 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { IncidentModel } from "../../models/incident";
-import ActionsButton from "./actions";
-import { Link } from "react-router-dom";
+import { IncidentModel } from "../../../models/incident";
 
 const incidentColumnHelper = createColumnHelper<IncidentModel>();
 
-export const INCIDENTCOLUMNS = [
-  // Display Column
-  incidentColumnHelper.display({
-    id: "select",
-    header: (props) => (
-      <input
-        type="checkbox"
-        checked={props.table.getIsAllRowsSelected()}
-        onChange={props.table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: (props) => (
-      <input
-        type="checkbox"
-        checked={props.row.getIsSelected()}
-        disabled={!props.row.getCanSelect()}
-        onChange={props.row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+export const COLUMNS = [
 
   incidentColumnHelper.accessor("id", {
     id: "id",
     header: "ID",
     footer: () => "ID",
     cell: (props) => (
-      <Link className="text-blue-500"  to={`/home/incidents/${props.row.original.id}`}>
+        <div>
         {props.row.original.id.substring(0, 5)}
-      </Link>
+        </div>
     ),
   }),
 
@@ -106,14 +85,6 @@ export const INCIDENTCOLUMNS = [
       return formattedDate1;
     },
     footer: () => "Occurence Date",
-  }),
-
-  // Display Column
-  incidentColumnHelper.display({
-    id: "actions",
-    header: "Actions",
-    footer: "Actions",
-    cell: (props) => <ActionsButton row={props.row} />,
   }),
 ];
 

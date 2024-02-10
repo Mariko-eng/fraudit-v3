@@ -191,13 +191,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                     icon={<TbFolder />}
                     children={
                       <>
-                        <SidebarChildItem
-                          linkString={""}
-                          itemName="Incidents"
-                        />
-                        <SidebarChildItem linkString={""} itemName="Suspects" />
-                        <SidebarChildItem linkString={""} itemName="Sfis" />
-                        <SidebarChildItem linkString={""} itemName="Users" />
+                        <SidebarChildItem linkString={"/home/reports/incidents"}itemName="Incidents"/>
+                        <SidebarChildItem linkString={"/home/reports/suspects"} itemName="Suspects" />
                       </>
                     }
                   />

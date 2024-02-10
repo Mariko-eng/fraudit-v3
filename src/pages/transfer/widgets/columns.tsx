@@ -109,7 +109,7 @@ export const TRANSFERCOLUMNS = [
     header: "Request Date",
     cell: (props) => {
       const today = new Date(props.getValue());
-      const formattedDate1 = format(today, "dd MMMM YYYY");
+      const formattedDate1 = format(today, "oM YYYY");
       return formattedDate1;
     },
     footer: () => "Request Date",

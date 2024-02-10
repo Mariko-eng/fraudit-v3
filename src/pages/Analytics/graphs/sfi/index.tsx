@@ -17,13 +17,15 @@ const AnalyticsGraphSfi = () => {
   const [error, setError] = useState<string>("");
   const [isSingle, setIsSingle] = useState<boolean | null>(null);
 
+  const [sfis, setSfis] = useState<SfiModel[]>([]);
   const [selectedSfi, setSelectedSfi] = useState("");
   const [selectedSfiName, setSelectedSfiName] = useState("");
 
-  const [sfis, setSfis] = useState<SfiModel[]>([]);
-
-  const [dataSingle, setDataSingle] = useState<SingleSfiResultsModel | null>(null);
-  const [dataMultiple, setDataMultiple] =useState<MultipleSfiResultsModel | null>(null);
+  const [dataSingle, setDataSingle] = useState<SingleSfiResultsModel | null>(
+    null
+  );
+  const [dataMultiple, setDataMultiple] =
+    useState<MultipleSfiResultsModel | null>(null);
 
   useEffect(() => {
     const getSfis = async () => {
@@ -55,7 +57,7 @@ const AnalyticsGraphSfi = () => {
       const params = {
         year: selectedYear,
         month: selectedMonth,
-        sfi: selectedSfi
+        sfi: selectedSfi,
       };
 
       const queryString = Object.entries(params)
@@ -101,9 +103,7 @@ const AnalyticsGraphSfi = () => {
   const MAmtbarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
       const categoryLabels =
-        dataMultiple.results?.actual_amt_sfi.map((item) =>
-          item.sfi
-        ) || [];
+        dataMultiple.results?.actual_amt_sfi.map((item) => item.sfi) || [];
       const categorySeries =
         dataMultiple.results.actual_amt_sfi?.map(
           (item) => item.avg_actual_amount
@@ -143,9 +143,7 @@ const AnalyticsGraphSfi = () => {
   const MSuspectsCategorybarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
       const categoryLabels =
-        dataMultiple.results.num_suspects_sfi?.map((item) =>
-          item.sfi
-        ) || [];
+        dataMultiple.results.num_suspects_sfi?.map((item) => item.sfi) || [];
       const categorySeries =
         dataMultiple.results.num_suspects_sfi?.map(
           (item) => item.sum_num_individuals
@@ -181,7 +179,6 @@ const AnalyticsGraphSfi = () => {
       },
     };
   }, [dataMultiple]);
-
 
   // Single Months Data
   const statusPieChartOptions: ApexOptions = useMemo(() => {
@@ -317,8 +314,7 @@ const AnalyticsGraphSfi = () => {
           item.category.substring(0, 4)
         ) || [];
       const countSeries =
-        dataSingle.results.category_incidents?.map((item) => item.count) ||
-        [];
+        dataSingle.results.category_incidents?.map((item) => item.count) || [];
       const suspectSeries =
         dataSingle.results.num_suspects_category?.map(
           (item) => item.sum_num_individuals
@@ -405,7 +401,6 @@ const AnalyticsGraphSfi = () => {
       },
     };
   }, [dataSingle]);
-
 
   return (
     <>
@@ -564,7 +559,7 @@ const AnalyticsGraphSfi = () => {
           </div>
         </div>
 
-                {error && <p>{error}</p>}
+        {error && <p>{error}</p>}
         {!error && (
           <div>
             {isSingle === null ? (

@@ -6,7 +6,7 @@ import { MultipleCategoryResultsModel } from "./data_types2";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
-export interface Category {
+interface Category {
   category: string;
 }
 
@@ -20,8 +20,8 @@ const AnalyticsGraphCategory = () => {
   const [error, setError] = useState<string>("");
   const [isSingle, setIsSingle] = useState<boolean | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const [dataSingle, setDataSingle] =
     useState<SingleCategoryResultsModel | null>(null);

@@ -98,7 +98,7 @@ export const USERCOLUMNS = [
     header: "Last Login",
     cell: (props) => {
       const today = new Date(props.getValue());
-      const formattedDate1 = format(today, "dd MMMM YYYY");
+      const formattedDate1 = format(today, "do MMMM YYYY");
       return formattedDate1;
     },
     footer: () => "Last Login",
@@ -108,7 +108,7 @@ export const USERCOLUMNS = [
     header: "Date Joined",
     cell: (props) => {
       const today = new Date(props.getValue());
-      const formattedDate1 = format(today, "dd MMMM YYYY");
+      const formattedDate1 = format(today, "do MMMM YYYY");
       return formattedDate1;
     },
     footer: () => "Date Joined",

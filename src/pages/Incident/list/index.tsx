@@ -4,13 +4,13 @@ import { useCallback, useState } from "react";
 import { useAppSelector } from "../../../redux/hooks";
 import { IncidentListModel, IncidentModel } from "../../../models/incident";
 import { useEffect, useMemo } from "react";
-import { TbArrowsSort } from "react-icons/tb";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { TbArrowsSort } from "react-icons/tb";
 import { INCIDENTCOLUMNS } from "../columns";
 import IncidentTableHeader from "../header";
 import { useParams } from "react-router-dom";

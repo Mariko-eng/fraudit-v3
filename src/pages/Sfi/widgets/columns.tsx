@@ -48,7 +48,7 @@ export const SFICOLUMNS = [
     header: "Date Created",
     cell: (props) => {
       const today = new Date(props.getValue());
-      const formattedDate1 = format(today, "dd MMMM YYYY");
+      const formattedDate1 = format(today, "do MMMM YYYY");
       return formattedDate1;
     },
     footer: () => "Date Created",

@@ -31,6 +31,8 @@ import AnalyticsStatsSfi from "./pages/Analytics/stats/sfi";
 import AnalyticsStatsGeneral from "./pages/Analytics/stats/general";
 import AnalyticsStatsCategory from "./pages/Analytics/stats/category";
 import AnalyticsStatsSubCategory from "./pages/Analytics/stats/sub_category";
+import IncidentReports from "./pages/Reports/incidents";
+import SuspectReports from "./pages/Reports/suspects";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -193,6 +195,14 @@ const App = () => {
         {
           path: "analytics/stats/general",
           element: <AnalyticsStatsGeneral />,
+        },
+        {
+          path: "reports/incidents",
+          element: <IncidentReports />,
+        },
+        {
+          path: "reports/suspects",
+          element: <SuspectReports />,
         },
       ],
     },

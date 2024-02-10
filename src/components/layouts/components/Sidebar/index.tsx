@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useAppDispatch } from "../../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { toggleSidebar } from "../../../../redux/slices/sidebar";
 import SidebarItem from "./SidebarItem";
 import SidebarChildItem from "./SidebarChildItem";
@@ -8,6 +8,9 @@ import { MdDashboard } from "react-icons/md";
 import { MdDescription } from "react-icons/md";
 import { MdAutoGraph } from "react-icons/md";
 import { MdGeneratingTokens } from "react-icons/md";
+import { TbFolder } from "react-icons/tb";
+import { TbPointFilled } from "react-icons/tb";
+import { SfiModel } from "../../../../models/sfi";
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -15,6 +18,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
   const dispatch = useAppDispatch();
+
+  const { user } = useAppSelector((store) => store.auth);
 
   return (
     <>
@@ -64,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                   <Link
                     to="/home"
                     onClick={() => dispatch(toggleSidebar(false))}
-                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
+                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-blue-100 group dark:text-gray-200 dark:hover:bg-gray-700"
                   >
                     <div className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
                       <MdDashboard />
@@ -76,25 +81,45 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                 </li>
 
                 <li>
-                  <Link
-                    to="/home/incidents"
-                    onClick={() => dispatch(toggleSidebar(false))}
-                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
-                  >
-                    <div className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
-                      <MdDescription />
-                    </div>
-                    <span className="ml-3" sidebar-toggle-item="true">
-                      Incidents
-                    </span>
-                  </Link>
+                  <SidebarItem
+                    itemName="Manage Incidents"
+                    icon={<MdDescription />}
+                    children={
+                      <>
+                        <SidebarChildItem
+                          linkString={"/home/incidents/status/SUSPICION"}
+                          itemName="Suspicion"
+                        />
+                        <SidebarChildItem
+                          linkString={"/home/incidents/status/GREY"}
+                          itemName="Grey List"
+                        />
+                        <SidebarChildItem
+                          linkString={"/home/incidents/status/BLACK"}
+                          itemName="Black List"
+                        />
+                        {user?.user_category === "SFI" && (
+                          <SidebarChildItem
+                            linkString={`/home/incidents/sfi/${
+                              (user.sfi as SfiModel).id
+                            }`}
+                            itemName="My Incidents"
+                          />
+                        )}
+                        <SidebarChildItem
+                          linkString={"/home/incidents"}
+                          itemName="All Incidents"
+                        />
+                      </>
+                    }
+                  />
                 </li>
 
                 <li>
                   <Link
-                    to=""
+                    to="/home/transfers"
                     onClick={() => dispatch(toggleSidebar(false))}
-                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
+                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-blue-100 group dark:text-gray-200 dark:hover:bg-gray-700"
                   >
                     <div className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
                       <MdGeneratingTokens />
@@ -105,35 +130,150 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                   </Link>
                 </li>
 
+                {user?.user_category === "SFI" ? (
+                  <></>
+                ) : (
+                  <li>
+                    <Link
+                      to="/home/sfis"
+                      onClick={() => dispatch(toggleSidebar(false))}
+                      className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-blue-100 group dark:text-gray-200 dark:hover:bg-gray-700"
+                    >
+                      <div className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white">
+                        <MdGeneratingTokens />
+                      </div>
+                      <span className="ml-3" sidebar-toggle-item="true">
+                        Sfis/Banks
+                      </span>
+                    </Link>
+                  </li>
+                )}
+
+                {user?.user_category === "SFI" ? (
+                  <></>
+                ) : (
+                  <li>
+                    <SidebarItem
+                      itemName="Manage Users"
+                      icon={<MdAccountBox />}
+                      children={
+                        <>
+                          <SidebarChildItem
+                            linkString={"/home/users/category/SFI"}
+                            itemName="SFI"
+                          />
+                          <SidebarChildItem
+                            linkString={"/home/users/category/UBA"}
+                            itemName="UBA"
+                          />
+                          <SidebarChildItem
+                            linkString={"/home/users/category/SOC"}
+                            itemName="SOC"
+                          />
+                          <SidebarChildItem
+                            linkString={"/home/users/category/ROOT"}
+                            itemName="ROOT"
+                          />
+                          <SidebarChildItem
+                            linkString={"/home/users"}
+                            itemName="All Users"
+                          />
+                        </>
+                      }
+                    />
+                  </li>
+                )}
+
+                <hr/>
                 <li>
                   <SidebarItem
                     itemName="Reports"
-                    icon={<MdAutoGraph />}
+                    icon={<TbFolder />}
                     children={
                       <>
-                        <SidebarChildItem linkString={""} itemName="Stats" />
-                        <SidebarChildItem linkString={""} itemName="Graphs" />
-                        <SidebarChildItem linkString={""} itemName="Summary" />
+                        <SidebarChildItem
+                          linkString={""}
+                          itemName="Incidents"
+                        />
+                        <SidebarChildItem linkString={""} itemName="Suspects" />
+                        <SidebarChildItem linkString={""} itemName="Sfis" />
+                        <SidebarChildItem linkString={""} itemName="Users" />
                       </>
                     }
                   />
                 </li>
-
                 <li>
                   <SidebarItem
-                    itemName="Users & Access"
-                    icon={<MdAccountBox />}
+                    itemName="Analytics"
+                    icon={<MdAutoGraph />}
                     children={
                       <>
-                        <SidebarChildItem linkString={"/home/users"} itemName="All" />
-                        <SidebarChildItem linkString={""} itemName="SFI" />
-                        <SidebarChildItem linkString={""} itemName="UBA" />
-                        {/* <SidebarChildItem linkString={""} itemName="SOC" /> */}
+                      <div className="mx-3">
+                          <SidebarItem
+                            itemName="Graphs"
+                            icon={<TbPointFilled />}
+                            children={
+                              <>
+                              <SidebarChildItem
+                                  linkString={"analytics/graphs/month"}
+                                  itemName="By Month"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/graphs/category"}
+                                  itemName="By Category"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/graphs/sub_category"}
+                                  itemName="By Sub Category"
+                                />
+                                 <SidebarChildItem
+                                  linkString={"analytics/graphs/sfi"}
+                                  itemName="By SFI/Bank"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/graphs/general"}
+                                  itemName="General"
+                                />
+                              </>
+                            }
+                          />
+                        </div>
+                        <div className="mx-3">
+                          <SidebarItem
+                            itemName="Stats"
+                            icon={<TbPointFilled />}
+                            children={
+                              <>
+                              <SidebarChildItem
+                                  linkString={"analytics/stats/month"}
+                                  itemName="By Month"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/stats/category"}
+                                  itemName="By Category"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/stats/sub_category"}
+                                  itemName="By Sub Category"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/stats/sfi"}
+                                  itemName="By SFI/Bank"
+                                />
+                                <SidebarChildItem
+                                  linkString={"analytics/stats/general"}
+                                  itemName="General"
+                                />
+                              </>
+                            }
+                          />
+                        </div>
                       </>
                     }
                   />
                 </li>
               </ul>
+
               <div className="pt-2 space-y-2">
                 <a
                   href="https://flowbite.com/docs/getting-started/introduction/"

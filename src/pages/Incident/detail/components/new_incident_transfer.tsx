@@ -1,4 +1,4 @@
-import { ParentModal } from "../../../../components/modals/messages";
+import { ParentModal } from "../../../../components/modals";
 
 
 const AddTransferRequestModal = ({

@@ -13,8 +13,13 @@ import {
 } from "@tanstack/react-table";
 import { INCIDENTCOLUMNS } from "../columns";
 import IncidentTableHeader from "../header";
+import { useParams } from "react-router-dom";
 
 function IncidentList() {
+  const params = useParams();
+
+  const { status } = params;
+
   const state = useAppSelector((store) => store.auth);
 
   const [tableData, setTableData] = useState<IncidentModel[]>([]);
@@ -26,33 +31,61 @@ function IncidentList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const incidentsQuery = useQuery({
-    queryKey: ["incidents", currentPage], // Include searchParams in the queryKey
+    queryKey: ["incidents", currentPage, status], // Include searchParams in the queryKey
     initialData: {},
-    queryFn: async () =>
-      await IncidentService.getIncidents(
-        {
-          page: currentPage,
-        },
-        {
-          Authorization: `Bearer ${state.tokens?.access}`,
-        }
-      ),
+    queryFn: async () => {
+      if (status) {
+        return await IncidentService.getIncidents(
+          {
+            page: currentPage,
+            status: status,
+          },
+          {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          }
+        );
+      } else {
+        return await IncidentService.getIncidents(
+          {
+            page: currentPage,
+          },
+          {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          }
+        );
+      }
+    },
   });
 
   const incidentsSearchQuery = useQuery({
-    queryKey: ["incidentSearch", searchParams, currentPage], // Include searchParams in the queryKey
+    queryKey: ["incidentSearch", searchParams, currentPage, status], // Include searchParams in the queryKey
     initialData: {},
-    queryFn: async () =>
-      await IncidentService.getIncidents(
-        {
-          search: searchParams,
-          page: currentPage,
-          // page_size: currentPageSize,
-        },
-        {
-          Authorization: `Bearer ${state.tokens?.access}`,
-        }
-      ),
+    queryFn: async () => {
+      if (status) {
+        return await IncidentService.getIncidents(
+          {
+            search: searchParams,
+            status: status,
+            page: currentPage,
+            // page_size: currentPageSize,
+          },
+          {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          }
+        );
+      } else {
+        return await IncidentService.getIncidents(
+          {
+            search: searchParams,
+            page: currentPage,
+            // page_size: currentPageSize,
+          },
+          {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          }
+        );
+      }
+    },
     enabled: searchParams.trim() !== "",
   });
 
@@ -90,9 +123,9 @@ function IncidentList() {
 
   const handleFilter = useCallback(() => {
     queryClient.refetchQueries({
-      queryKey: ["incidentSearch", searchParams, currentPage],
+      queryKey: ["incidentSearch", searchParams, currentPage, status],
     });
-  }, [queryClient, searchParams, currentPage]);
+  }, [queryClient, searchParams, currentPage, status]);
 
   useEffect(() => {
     if (searchParams.trim() !== "") {
@@ -111,6 +144,14 @@ function IncidentList() {
   const headerGroups = tableInstance.getHeaderGroups();
 
   const rowModel = tableInstance.getRowModel();
+
+  // Use useEffect to trigger a manual refetch when needed
+  useEffect(() => {
+    // Manually trigger a refetch when the component mounts or when specific dependencies change
+    queryClient.refetchQueries({
+      queryKey: ["incidents", currentPage, status],
+    });
+  }, [queryClient, currentPage, status]); // Specify dependencies as needed
 
   return (
     <div>
@@ -185,7 +226,9 @@ function IncidentList() {
         {incidentsQuery.data ? (
           <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
             <IncidentTableHeader
-              totalNo={incidentsQuery.data.count ? incidentsQuery.data.count : 0}
+              totalNo={
+                incidentsQuery.data.count ? incidentsQuery.data.count : 0
+              }
               searchParams={searchParams}
               handleSearch={handleSearch}
             />

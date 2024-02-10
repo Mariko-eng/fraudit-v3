@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../../redux/hooks";
 
 const IncidentActionsButton = ({
   incidentId,
   incidentStatus,
-  openFilesModal,
   handleTransfer,
   handleDelete,
 }: {
   incidentId: string | undefined;
   incidentStatus: string | undefined;
-  openFilesModal: () => void;
   handleTransfer: () => void;
   handleDelete: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { user } = useAppSelector((store) => store.auth);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -31,7 +32,7 @@ const IncidentActionsButton = ({
             id="options-menu"
             aria-haspopup="listbox"
           >
-          {"<"} More Options {">"}
+            {"<"} Incident Options {">"}
           </button>
         </div>
 
@@ -43,29 +44,20 @@ const IncidentActionsButton = ({
             aria-orientation="vertical"
             aria-labelledby="options-menu"
           >
-            <div
-              className="py-1"
-              role="menuitem"
-              tabIndex={0}
-              onClick={() => {
-                toggleDropdown();
-                openFilesModal();
-              }}
-            >
-              <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Upload Incident Files
-              </a>
-            </div>
             <div className="py-1" role="menuitem" tabIndex={1}>
               <Link
                 className="relative z-10"
-                to={`/min_admin/incidents/accounts/${incidentId}`}
+                to={
+                  user?.user_category === "SFI"
+                    ? `/home/incidents/${incidentId}/edit-sfi`
+                    : user?.user_category === "UBA" ||
+                      user?.user_category === "SOC"
+                    ? `/home/incidents/${incidentId}/edit-uba`
+                    : `#`
+                }
               >
-                <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Add Involved Accounts
+                <div className="block px-4 py-2 text-sm text-center text-gray-700 hover:bg-gray-100">
+                  Edit Incident
                 </div>
               </Link>
             </div>
@@ -81,7 +73,7 @@ const IncidentActionsButton = ({
               >
                 <a
                   href="#"
-                  className="block px-4 py-2 text-sm text-cyan-700 hover:bg-cyan-100"
+                  className="block px-4 py-2 text-sm text-center text-cyan-700 hover:bg-cyan-100"
                 >
                   Add Blacklist Request
                 </a>
@@ -98,9 +90,9 @@ const IncidentActionsButton = ({
             >
               <a
                 href="#"
-                className="block px-4 py-2 text-sm text-red-700 hover:bg-red-100"
+                className="block px-4 py-2 text-sm text-center text-red-700 hover:bg-red-100"
               >
-                Delete Incident Now
+                Delete Incident
               </a>
             </div>
           </div>

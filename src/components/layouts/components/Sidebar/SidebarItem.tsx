@@ -23,7 +23,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       <button
         type="button"
         onClick={() => toggleItem()}
-        className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-blue-100 dark:text-gray-200 dark:hover:bg-blue-200"
         // aria-controls="dropdown-pages"
         // data-collapse-toggle="dropdown-pages"
       >
@@ -31,7 +31,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           {icon}
         </div>
         <span
-          className="flex-1 ml-3 text-left whitespace-nowrap"
+          className="flex-1 ml-3 text-base text-left whitespace-nowrap"
           sidebar-toggle-item="true"
         >
           {itemName}

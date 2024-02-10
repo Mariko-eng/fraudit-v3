@@ -1,4 +1,4 @@
-import { ParentModal } from ".";
+import { ParentModal } from "..";
 
 export const LoadingModal = ({
   loadingMessage,

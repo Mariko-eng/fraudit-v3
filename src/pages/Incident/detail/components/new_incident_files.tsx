@@ -1,6 +1,6 @@
 import React from "react";
 import { SyntheticEvent, useState } from "react";
-import { ParentModal } from "../../../../components/modals/messages";
+import { ParentModal } from "../../../../components/modals";
 
 const AddIncidentFilesModal = ({
   open,

@@ -6,7 +6,6 @@ const login = (email: string, password: string) => {
     email,
     password,
   }).then((response) => {
-    console.log(response.data);
 
     if (response.data.tokens) {
       localStorage.setItem("tokens", JSON.stringify(response.data.tokens));

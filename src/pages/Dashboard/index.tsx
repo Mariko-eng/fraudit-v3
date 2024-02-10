@@ -1,10 +1,37 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { API } from "../../utils/api";
+import { useAppSelector } from "../../redux/hooks";
+import { DashboardDataModel } from "./data_types";
 
 interface MyComponentProps {}
 
 const Dashboard: React.FC<MyComponentProps> = () => {
+  const state = useAppSelector((store) => store.auth);
+
+  const [data, setData] = useState<DashboardDataModel[]>([]);
+
+    useEffect(() => {
+    const getCategoricalData = async () => {
+      try {
+        const url = `/api/dashboard/`;
+
+        const response = await API.get(url, {
+          headers: {
+            Authorization: `Bearer ${state.tokens?.access}`,
+          },
+        });
+
+        setData(response.data as DashboardDataModel[]);
+      } catch (e) {
+        console.error("Error fetching data:", e);
+      }
+    };
+    getCategoricalData();
+  }, [state, setCategories]);
+
+
   const lineChartOptions: ApexOptions = {
     chart: {
       height: 350,

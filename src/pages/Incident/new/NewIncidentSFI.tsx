@@ -158,9 +158,10 @@ const NewIncidentSFI = () => {
                         <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-400">
                           New Incident
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">
-                          Write a few sentences about the occurence
+                        <p className="mt-1 text-sm leading-6 text-blue-500">
+                          Please Provide Incident Details
                         </p>
+                        <hr />
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                           <div className="sm:col-span-3">

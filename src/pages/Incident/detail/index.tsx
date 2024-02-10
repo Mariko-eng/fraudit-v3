@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs } from "flowbite-react";
 import { HiArchive, HiFolder, HiUserCircle } from "react-icons/hi";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import IncidentService from "../../../services/incident.service";
 import { useAppSelector } from "../../../redux/hooks";
 import { useEffect, useState } from "react";
@@ -16,6 +16,9 @@ import { LoadingModal } from "../../../components/modals/messages/LoadingModal";
 import { ErrorModal } from "../../../components/modals/messages/ErrorModal";
 import { SuccessModal } from "../../../components/modals/messages/SuccessModal";
 import { Link } from "react-router-dom";
+import IncidentActionsButton from "./components/actions_button";
+import { CreatedByUserModel } from "../../../models/user";
+import { SfiModel } from "../../../models/sfi";
 
 const IncidentDetail = () => {
   const params = useParams();
@@ -23,7 +26,11 @@ const IncidentDetail = () => {
   const { id } = params;
   const incidentId = id;
 
+  const navigate = useNavigate()
+
   const state = useAppSelector((store) => store.auth);
+
+  const { user } = state;
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -57,17 +64,13 @@ const IncidentDetail = () => {
   }, [incidentQuery]);
 
   const addIncidentFilesMutation = useMutation({
-    mutationFn: ({fileData}: {fileData: FormData}) => {
+    mutationFn: ({ fileData }: { fileData: FormData }) => {
       setOpenAddFiles(false);
       setOpen(true);
       return IncidentService.addFilesToIncident(
         fileData,
         `Bearer ${state.tokens?.access}`
-        // {
-        //   Authorization: `Bearer ${state.tokens?.access}`,
-        //   "Content-Type": "multipart/form-data", // Change Content Type
-        // }
-      )
+      );
     },
     onSuccess: (val) => {
       setOpen(true);
@@ -77,7 +80,7 @@ const IncidentDetail = () => {
       return val;
     },
     onError: (error: CustomError) => {
-      console.log(error)
+      console.log(error);
       setOpen(true);
       setTimeout(() => {
         setOpen(false);
@@ -91,6 +94,69 @@ const IncidentDetail = () => {
       fileData: data,
     });
   };
+
+  const addIncidentTransferRequestMutation = useMutation({
+    mutationFn: (data: object) =>
+      IncidentService.addTransferRequest(
+        { ...data },
+        {
+          Authorization: `Bearer ${state.tokens?.access}`,
+          "Content-Type": "application/json",
+        }
+      ),
+    onSuccess: (val) => {
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+        return val;
+      }, 3000);
+    },
+    onError: (error: CustomError) => {
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+        return error;
+      }, 4000);
+    },
+  });
+
+  const handleTransfer = () => {
+    if (incidentId) {
+      addIncidentTransferRequestMutation.mutate(
+         { incident_id: incidentId },
+      );
+    }
+  };
+
+  const deleteIncidentMutation = useMutation({
+    mutationFn: (ID: string) =>
+      IncidentService.deleteIncident(ID, {
+        Authorization: `Bearer ${state.tokens?.access}`,
+        "Content-Type": "application/json",
+      }),
+    onSuccess: (val) => {
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+          navigate("/home/incidents", { replace: true });
+        return val;
+      }, 3000);
+    },
+    onError: (error: CustomError) => {
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+        return error;
+      }, 4000);
+    },
+  });
+
+  const handleDelete = () => {
+    if (incidentId) {
+      deleteIncidentMutation.mutate(incidentId);
+    }
+  };
+
 
   return (
     <>
@@ -120,6 +186,66 @@ const IncidentDetail = () => {
           setOpen={setOpen}
           successTitle="Sucess!"
           successMessage="Incident Files Added successfully!"
+        />
+      )}
+
+      {addIncidentTransferRequestMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Submitting Incident BlackList Request ..."
+        />
+      )}
+
+      {addIncidentTransferRequestMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={
+            addIncidentTransferRequestMutation.error.response?.statusText
+          }
+          errorMessage={
+            addIncidentTransferRequestMutation.error.errorMessage ??
+            addIncidentTransferRequestMutation.error.message
+          }
+        />
+      )}
+
+      {addIncidentTransferRequestMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="Incident Black List Request Submitted successfully!"
+        />
+      )}
+
+      {deleteIncidentMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Deleting Incident ..."
+        />
+      )}
+
+      {deleteIncidentMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={deleteIncidentMutation.error.response?.statusText}
+          errorMessage={
+            deleteIncidentMutation.error.errorMessage ??
+            deleteIncidentMutation.error.message
+          }
+        />
+      )}
+
+      {deleteIncidentMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="Incident deleted successfully!"
         />
       )}
 
@@ -217,15 +343,51 @@ const IncidentDetail = () => {
                                   </p>
                                 </div>
                                 <div>
-                                  <button
-                                    style={{ height: "40px", width: "150px" }}
-                                    className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center"
-                                  >
-                                    <span className="mr-1">
-                                      <MdEdit />
-                                    </span>
-                                    Edit Details
-                                  </button>
+                                  {incident?.status !== "BLACK" && (
+                                    <>
+                                      {user?.user_category === "SOC" ||
+                                      user?.user_category === "UBA" ? (
+                                        <>
+                                          {(
+                                            incident?.created_by as CreatedByUserModel
+                                          )?.id === user.id && (
+                                            <IncidentActionsButton
+                                              incidentId={incident?.id}
+                                              incidentStatus={incident?.status}
+                                              handleTransfer={() =>
+                                                handleTransfer()
+                                              }
+                                              handleDelete={() =>
+                                                handleDelete()
+                                              }
+                                            />
+                                          )}
+                                        </>
+                                      ) : (
+                                        <>
+                                          {user?.user_category === "SFI" && (
+                                            <>
+                                              {(user.sfi as SfiModel)?.id ===
+                                                incident?.sfi?.id && (
+                                                <IncidentActionsButton
+                                                  incidentId={incident?.id}
+                                                  incidentStatus={
+                                                    incident?.status
+                                                  }
+                                                  handleTransfer={() =>
+                                                    handleTransfer()
+                                                  }
+                                                  handleDelete={() =>
+                                                    handleDelete()
+                                                  }
+                                                />
+                                              )}
+                                            </>
+                                          )}
+                                        </>
+                                      )}
+                                    </>
+                                  )}
                                 </div>
                               </div>
 
@@ -309,7 +471,7 @@ const IncidentDetail = () => {
                                 </div>
 
                                 <Link
-                                to={`/home/incidents/${incidentId}/suspects-new`}
+                                  to={`/home/incidents/${incidentId}/suspects-new`}
                                   style={{ height: "40px", width: "150px" }}
                                   className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center"
                                 >

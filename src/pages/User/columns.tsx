@@ -32,6 +32,12 @@ export const USERCOLUMNS = [
     footer: () => "Name/s",
   }),
 
+  userColumnHelper.accessor((row) => `${row.email}`, {
+    id: "email",
+    header: "Email",
+    footer: () => "Email",
+  }),
+
   userColumnHelper.accessor((row) => `${row.phone_number}`, {
     id: "Phone",
     header: "Phone No",

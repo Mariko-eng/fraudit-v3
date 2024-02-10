@@ -178,11 +178,49 @@ const NewIncidentUBA = () => {
                         <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-400">
                           New Incident
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-gray-600">
-                          Write a few sentences about the occurence
+                        <p className="mt-1 text-sm leading-6 text-blue-500">
+                          Please Provide Incident Details
                         </p>
+                        <hr />
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                                                    <div className="col-span-full">
+                            <label
+                              htmlFor="file"
+                              // className="sr-only"
+                              className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-400"
+                            >
+                              Financial Institution
+                            </label>
+
+                            <div className="col-span-9">
+                              <div className="sm:flex">
+                                <select
+                                  {...formik.getFieldProps("sfi_id")}
+                                  onChange={handleChange}
+                                  className="py-2 px-3 pr-11 block w-full border-gray-200 shadow-sm -mt-px -ml-px first:rounded-t-lg last:rounded-b-lg sm:first:rounded-l-lg sm:mt-0 sm:first:ml-0 sm:first:rounded-tr-none sm:last:rounded-bl-none sm:last:rounded-r-lg text-sm relative focus:z-10 focus:border-[#00AFD7] focus:ring-[#00AFD7] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
+                                >
+                                  <option value="">Select SFI</option>
+                                  {sfiList && sfiList.length > 0 ? (
+                                    sfiList.map((sfi, idx) => (
+                                      <option key={idx} value={sfi.id}>
+                                        {sfi.unique_number}
+                                      </option>
+                                    ))
+                                  ) : (
+                                    <></>
+                                  )}
+                                </select>
+                              </div>
+                            </div>
+                            {/* <!-- End Col --> */}
+                            <ErrorMessage
+                              name="sfi_id"
+                              component="div"
+                              className="text-red-500"
+                            />
+                          </div>
+
                           <div className="sm:col-span-3">
                             <label
                               htmlFor="country"
@@ -422,43 +460,6 @@ const NewIncidentUBA = () => {
                             </div>
                             <ErrorMessage
                               name="description"
-                              component="div"
-                              className="text-red-500"
-                            />
-                          </div>
-
-                          <div className="col-span-full">
-                            <label
-                              htmlFor="file"
-                              // className="sr-only"
-                              className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-400"
-                            >
-                              Financial Institution
-                            </label>
-
-                            <div className="col-span-9">
-                              <div className="sm:flex">
-                                <select
-                                  {...formik.getFieldProps("sfi_id")}
-                                  onChange={handleChange}
-                                  className="py-2 px-3 pr-11 block w-full border-gray-200 shadow-sm -mt-px -ml-px first:rounded-t-lg last:rounded-b-lg sm:first:rounded-l-lg sm:mt-0 sm:first:ml-0 sm:first:rounded-tr-none sm:last:rounded-bl-none sm:last:rounded-r-lg text-sm relative focus:z-10 focus:border-[#00AFD7] focus:ring-[#00AFD7] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
-                                >
-                                  <option value="">Select SFI</option>
-                                  {sfiList && sfiList.length > 0 ? (
-                                    sfiList.map((sfi, idx) => (
-                                      <option key={idx} value={sfi.id}>
-                                        {sfi.unique_number}
-                                      </option>
-                                    ))
-                                  ) : (
-                                    <></>
-                                  )}
-                                </select>
-                              </div>
-                            </div>
-                            {/* <!-- End Col --> */}
-                            <ErrorMessage
-                              name="sfi_id"
                               component="div"
                               className="text-red-500"
                             />

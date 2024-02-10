@@ -1,4 +1,4 @@
-import { ParentModal } from ".";
+import { ParentModal } from "..";
 import { MdOutlineWarning } from "react-icons/md";
 
 export const ErrorModal = ({

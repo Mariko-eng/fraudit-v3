@@ -35,10 +35,10 @@ export interface IncidentModel {
   suspected_amount: number;
   actual_date: string;
   discovered_date: string | undefined;
-  police_reference_no: string | number | undefined;
-  actions_taken: string | number | undefined;
-  lessons_taken: string | number | undefined;
-  status: string | undefined;
+  police_reference_no: string | undefined;
+  actions_taken: string | undefined;
+  lessons_taken: string | undefined;
+  status: string;
   is_active: boolean | false;
   sfi: SfiModel | undefined;
   incidentfile_set: IncidentFileModel[] | [];

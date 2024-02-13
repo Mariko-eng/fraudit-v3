@@ -1,6 +1,14 @@
 import { API } from "../utils/api";
 
 
+const searchIncidents = (query: string, headers: object) => {
+
+  return API.get(`/api/incident/list/?search=${query}`, { headers: headers }).then((response) => {
+    return response.data;
+  });
+};
+
+
 const getIncidents = (params: object, headers: object) => {
 
   // Convert params object to a query string
@@ -36,6 +44,13 @@ const updateIncident = (incidentId: string, data: object, headers: object) => {
   });
 };
 
+const deleteIncident = (ID: string, headers: object) => {
+
+  return API.delete(`/api/incident/delete/${ID}/` ,{ headers: headers }).then((response) => {
+    return response;
+  });
+};
+
 
 const addFilesToIncident = (data: FormData, token: string) => {
   return API.post('/api/incident/file/add/', data, {
@@ -48,6 +63,7 @@ const addFilesToIncident = (data: FormData, token: string) => {
   });
 };
 
+
 const addIncidentSuspects = (data: FormData, incidentId: string, token: string) => {
   return API.put(`/api/incident/involved-individuals/add/${incidentId}/`, data, {
     headers: {
@@ -55,13 +71,6 @@ const addIncidentSuspects = (data: FormData, incidentId: string, token: string) 
       "Content-Type": "multipart/form-data",
     },
   }).then((response) => {
-    return response;
-  });
-};
-
-const deleteIncident = (ID: string, headers: object) => {
-
-  return API.delete(`/api/incident/delete/${ID}/` ,{ headers: headers }).then((response) => {
     return response;
   });
 };
@@ -86,7 +95,7 @@ const getTransferRequestById = (id: string, headers: object) => {
     return response.data;
   });
 };
-
+ 
 
 const addTransferRequest = (data: object, headers: object) => {
   return API.post('/api/incident/transfer/add/', data ,{ headers: headers }).then((response) => {
@@ -118,6 +127,8 @@ const deleteTransferRequest = (ID: string, headers: object) => {
 
 
 const IncidentService = {
+  searchIncidents,
+  
   getIncidents,
   getIncidentById,
   addIncident,

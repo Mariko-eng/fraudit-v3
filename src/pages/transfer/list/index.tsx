@@ -1,6 +1,6 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import IncidentService from "../../../services/incident.service";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useAppSelector } from "../../../redux/hooks";
 // import { IncidentListModel, IncidentModel } from "../../../models/incident";
 import { TransferListModel, TransferModel } from "../../../models/transfer";
@@ -15,6 +15,14 @@ import {
 import { TRANSFERCOLUMNS } from "../widgets/columns";
 import TransferTableHeader from "../widgets/header";
 import { useParams } from "react-router-dom";
+import { CustomError } from "../../../utils/api";
+import { SuccessModal } from "../../../components/modals/messages/SuccessModal";
+import { ErrorModal } from "../../../components/modals/messages/ErrorModal";
+import { LoadingModal } from "../../../components/modals/messages/LoadingModal";
+import { TransferApproveModal } from "../modals/approveTransferModal";
+import { TransferDeclineModal } from "../modals/declineTransferModal";
+import { TransferDeleteModal } from "../modals/deleteTransferModal";
+import { TransferActionsButton } from "../widgets/actions";
 
 function TransferList() {
   const params = useParams();
@@ -23,11 +31,23 @@ function TransferList() {
 
   const state = useAppSelector((store) => store.auth);
 
+  const [open, setOpen] = useState<boolean>(false);
+  const [openApprove, setOpenApprove] = useState<boolean>(false);
+  const [openDecline, setOpenDecline] = useState<boolean>(false);
+  const [openDelete, setOpenDelete] = useState<boolean>(false);
+
+  const [responseData, setResponseData] = useState<TransferListModel | null>(
+    null
+  );
   const [tableData, setTableData] = useState<TransferModel[]>([]);
+
+  const [selectedRowData, setSelectedRowData] = useState<TransferModel | null>(
+    null
+  );
 
   const queryClient = useQueryClient();
 
-  const [searchParams, setSearchParams] = useState<string>("");
+  // const [searchParams, setSearchParams] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -58,81 +78,160 @@ function TransferList() {
     },
   });
 
-  const transfersSearchQuery = useQuery({
-    queryKey: ["transferSearch", searchParams, currentPage, status], // Include searchParams in the queryKey
-    initialData: {},
-    queryFn: async () => {
-      if (status) {
-        return await IncidentService.getTransferRequests(
-          {
-            search: searchParams,
-            status: status,
-            page: currentPage,
-            // page_size: currentPageSize,
-          },
-          {
-            Authorization: `Bearer ${state.tokens?.access}`,
-          }
-        );
-      } else {
-        return await IncidentService.getTransferRequests(
-          {
-            search: searchParams,
-            page: currentPage,
-            // page_size: currentPageSize,
-          },
-          {
-            Authorization: `Bearer ${state.tokens?.access}`,
-          }
-        );
-      }
-    },
-    enabled: searchParams.trim() !== "",
-  });
-
   useEffect(() => {
-    if (searchParams.trim() === "") {
       const transferData: TransferListModel =
         transfersQuery.data as TransferListModel;
 
+      setResponseData(transferData)
       setTableData(transferData.results);
-    } else {
-      const transferData: TransferListModel =
-        transfersSearchQuery.data as TransferListModel;
-
-      setTableData(transferData.results);
-    }
   }, [
-    searchParams,
-    transfersQuery.data,
-    transfersSearchQuery.data,
+    transfersQuery,
     setTableData,
   ]);
 
-  const [columns, data] = useMemo(() => {
-    if (tableData !== undefined) {
-      return [TRANSFERCOLUMNS, tableData];
-    }
-    return [TRANSFERCOLUMNS, []];
-  }, [tableData]);
-
   // console.log(transfersQuery.data)
 
-  const handleSearch = (value: string) => {
-    setSearchParams(value);
+  // Use useEffect to trigger a manual refetch when needed
+  useEffect(() => {
+    // Manually trigger a refetch when the component mounts or when specific dependencies change
+    queryClient.refetchQueries({
+      queryKey: ["transfers", currentPage, status],
+    });
+  }, [queryClient, currentPage, status]); // Specify dependencies as needed
+
+  const appoveTransferMutation = useMutation({
+    mutationFn: async (data: { transferId: string }) => {
+      setOpen(true);
+      return await IncidentService.approveTransferRequest(data.transferId, {
+        Authorization: `Bearer ${state.tokens?.access}`,
+        "Content-Type": "application/json",
+      });
+    },
+    onSuccess: () => {
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+        window.location.reload();
+      }, 4000);
+    },
+    onError: (error: CustomError) => {
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+      return error;
+    },
+  });
+
+  const handleTransferApprove = (id: string) => {
+    appoveTransferMutation.mutate({
+      transferId: id,
+    });
   };
 
-  const handleFilter = useCallback(() => {
-    queryClient.refetchQueries({
-      queryKey: ["transferSearch", searchParams, currentPage, status],
-    });
-  }, [queryClient, searchParams, currentPage, status]);
+  const declineTransferMutation = useMutation({
+    mutationFn: async (data: { transferId: string }) => {
+      setOpen(true);
+      return await IncidentService.declineTransferRequest(data.transferId, {
+        Authorization: `Bearer ${state.tokens?.access}`,
+        "Content-Type": "application/json",
+      });
+    },
+    onSuccess: () => {
+      setOpen(true);
 
-  useEffect(() => {
-    if (searchParams.trim() !== "") {
-      handleFilter();
+      setTimeout(() => {
+        setOpen(false);
+        window.location.reload();
+      }, 4000);
+    },
+    onError: (error: CustomError) => {
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+      return error;
+    },
+  });
+
+  const handleTransferDecline = (id: string) => {
+    declineTransferMutation.mutate({
+      transferId: id,
+    });
+  };
+
+  const deleteTransferMutation = useMutation({
+    mutationFn: async (sfiId: string) => {
+      setOpen(true);
+      return await IncidentService.deleteTransferRequest(sfiId, {
+        Authorization: `Bearer ${state.tokens?.access}`,
+        "Content-Type": "application/json",
+      });
+    },
+    onSuccess: () => {
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+      window.location.reload();
+    },
+    onError: (error: CustomError) => {
+      console.log(error);
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+    },
+  });
+
+  const handleTransferDelete = (id: string) => {
+    deleteTransferMutation.mutate(id);
+  };
+
+  const openTransferApprove = ({ prevData }: { prevData: TransferModel }) => {
+    setSelectedRowData(prevData);
+    setOpenApprove(true);
+  };
+
+  const openTransferDecline = ({ prevData }: { prevData: TransferModel }) => {
+    setSelectedRowData(prevData);
+    setOpenDecline(true);
+  };
+
+  const openTransferDelete = ({ prevData }: { prevData: TransferModel }) => {
+    setSelectedRowData(prevData);
+    setOpenDelete(true);
+  };
+
+  const [columns, data] = useMemo(() => {
+    // Define columns with additional function passed to ActionsButton
+    const cols = TRANSFERCOLUMNS.map((col) => {
+      if (col.id === "actions") {
+        return {
+          ...col,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          cell: (props: any) => (
+            <TransferActionsButton
+              props={props}
+              openTransferApprove={openTransferApprove}
+              openTransferDecline={openTransferDecline}
+              opentransferDelete={openTransferDelete}
+            />
+          ),
+        };
+      }
+      return col;
+    });
+
+    if (tableData !== undefined) {
+      return [cols, tableData];
     }
-  }, [searchParams, currentPage, handleFilter]);
+    return [cols, []];
+  }, [tableData]);
 
   const tableInstance = useReactTable({
     columns,
@@ -146,16 +245,95 @@ function TransferList() {
 
   const rowModel = tableInstance.getRowModel();
 
-  // Use useEffect to trigger a manual refetch when needed
-  useEffect(() => {
-    // Manually trigger a refetch when the component mounts or when specific dependencies change
-    queryClient.refetchQueries({
-      queryKey: ["transfers", currentPage, status],
-    });
-  }, [queryClient, currentPage, status]); // Specify dependencies as needed
-
   return (
-    <div>
+    <>
+      {appoveTransferMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Approving Transfer ..."
+        />
+      )}
+
+      {appoveTransferMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={appoveTransferMutation.error.response?.statusText}
+          errorMessage={
+            appoveTransferMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {appoveTransferMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="Transfer Approved successfully!"
+        />
+      )}
+
+      {declineTransferMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Declining Transfer ..."
+        />
+      )}
+
+      {declineTransferMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={declineTransferMutation.error.response?.statusText}
+          errorMessage={
+            declineTransferMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {declineTransferMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="Transfer Declined successfully!"
+        />
+      )}
+
+      {deleteTransferMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Deleting Transfer ..."
+        />
+      )}
+
+      {deleteTransferMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={deleteTransferMutation.error.response?.statusText}
+          errorMessage={
+            deleteTransferMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {deleteTransferMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="Transfer deleted successfully!"
+        />
+      )}
+
       <div className="mb-4 col-span-full xl:mb-2">
         <nav className="flex mb-5" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
@@ -214,7 +392,7 @@ function TransferList() {
                 <span
                   className="ml-1 text-gray-400 md:ml-2 dark:text-gray-500"
                   aria-current="page"
-                > 
+                >
                   List
                 </span>
               </div>
@@ -224,14 +402,12 @@ function TransferList() {
       </div>
 
       <div>
-        {transfersQuery.data ? (
+        {responseData ? (
           <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
             <TransferTableHeader
               totalNo={
-                transfersQuery.data.count ? transfersQuery.data.count : 0
+                responseData.count ? responseData.count : 0
               }
-              searchParams={searchParams}
-              handleSearch={handleSearch}
             />
 
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -271,7 +447,10 @@ function TransferList() {
                       className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="w-5 p-4 items-center text-center">
+                        <td
+                          key={cell.id}
+                          className="w-5 p-4 items-center text-center"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -286,11 +465,12 @@ function TransferList() {
             </div>
 
             <br />
+            { responseData.total && 
             <div>
               <p>
                 Page{" "}
                 <span>
-                  {currentPage} of {""} {transfersQuery.data.total}
+                  {currentPage} of {""} {responseData.total}
                 </span>
               </p>
               <nav aria-label="Page navigation example">
@@ -306,13 +486,13 @@ function TransferList() {
                           }
                         });
                       }}
-                      disabled={transfersQuery.data.previous === null}
+                      disabled={responseData.previous === null}
                       className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
                       Previous
                     </button>
                   </li>
-                  {[...Array(transfersQuery.data.total).keys()].map((index) => (
+                  {[...Array(responseData.total).keys()].map((index) => (
                     <li key={index}>
                       <button
                         onClick={() => {
@@ -329,7 +509,7 @@ function TransferList() {
                       onClick={() => {
                         setCurrentPage((prev) => prev + 1);
                       }}
-                      disabled={transfersQuery.data.next === null}
+                      disabled={responseData.next === null}
                       className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
                       Next
@@ -338,14 +518,40 @@ function TransferList() {
                 </ul>
               </nav>
             </div>
+            }
           </div>
         ) : (
           <p>Loading....</p>
         )}
-
-        {/* <BasicTable /> */}
       </div>
-    </div>
+
+      {openApprove && selectedRowData !== null && (
+        <TransferApproveModal
+          open={openApprove}
+          setOpen={setOpenApprove}
+          ID={selectedRowData.id}
+          approveTransfer={handleTransferApprove}
+        />
+      )}
+
+      {openDecline && selectedRowData !== null && (
+        <TransferDeclineModal
+          open={openDecline}
+          setOpen={setOpenDecline}
+          ID={selectedRowData.id}
+          declineTransfer={handleTransferDecline}
+        />
+      )}
+
+      {openDelete && selectedRowData !== null && (
+        <TransferDeleteModal
+          open={openDelete}
+          setOpen={setOpenDelete}
+          ID={selectedRowData.id}
+          deleteTransfer={handleTransferDelete}
+        />
+      )}
+    </>
   );
 }
 

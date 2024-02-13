@@ -2,31 +2,31 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { TransferModel } from "../../../models/transfer";
 import { IncidentModel } from "../../../models/incident";
-import ActionsButton from "./actions";
+import { TransferActionsButton } from "./actions";
 import { Link } from "react-router-dom";
 
 const columnHelper = createColumnHelper<TransferModel>();
 
 export const TRANSFERCOLUMNS = [
   // Display Column
-  columnHelper.display({
-    id: "select",
-    header: (props) => (
-      <input
-        type="checkbox"
-        checked={props.table.getIsAllRowsSelected()}
-        onChange={props.table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: (props) => (
-      <input
-        type="checkbox"
-        checked={props.row.getIsSelected()}
-        disabled={!props.row.getCanSelect()}
-        onChange={props.row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+  // columnHelper.display({
+  //   id: "select",
+  //   header: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.table.getIsAllRowsSelected()}
+  //       onChange={props.table.getToggleAllRowsSelectedHandler()}
+  //     />
+  //   ),
+  //   cell: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.row.getIsSelected()}
+  //       disabled={!props.row.getCanSelect()}
+  //       onChange={props.row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
 
   columnHelper.accessor("id", {
     id: "id",
@@ -120,6 +120,13 @@ export const TRANSFERCOLUMNS = [
     id: "actions",
     header: "Actions",
     footer: "Actions",
-    cell: (props) => <ActionsButton row={props.row} />,
+    cell: (props) => (
+      <TransferActionsButton
+        props={props}
+        openTransferApprove={() => {}}
+        openTransferDecline={() => {}}
+        opentransferDelete={() => {}}
+      />
+    ),
   }),
 ];

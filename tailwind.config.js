@@ -7,7 +7,11 @@ export default {
     "node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["serif"],
+      },
+    },
   },
   // plugins: [flowbite],
   plugins: [require("flowbite/plugin")],

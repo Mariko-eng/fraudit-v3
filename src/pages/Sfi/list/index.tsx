@@ -13,11 +13,14 @@ import {
 import { SFICOLUMNS } from "../widgets/columns";
 import SfiTableHeader from "../widgets/header";
 import { SfiListModel, SfiModel } from "../../../models/sfi";
-import { CustomError } from "../../../utils/api";
-import ActionsButton from "../widgets/actions";
+import { SfiActionsButton } from "../widgets/actions";
 import { SfiUpdateModal } from "../modals/updateSfiModal";
 import { SfiDeleteModal } from "../modals/deleteSfiModal";
 import { SfiCreateModal } from "../modals/createSfiModal";
+import { LoadingModal } from "../../../components/modals/messages/LoadingModal";
+import { ErrorModal } from "../../../components/modals/messages/ErrorModal";
+import { SuccessModal } from "../../../components/modals/messages/SuccessModal";
+import { CustomError } from "../../../utils/api";
 
 function SfiList() {
   const state = useAppSelector((store) => store.auth);
@@ -39,6 +42,44 @@ function SfiList() {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  const createSFIMutation = useMutation({
+    mutationFn: async (newSFIData: object) => {
+      setOpen(true);
+      return await SfiService.addSfi(
+        { ...newSFIData },
+        {
+          Authorization: `Bearer ${state.tokens?.access}`,
+          "Content-Type": "application/json",
+        }
+      );
+    },
+    onSuccess: () => {
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+      window.location.reload();
+    },
+    onError: (error: CustomError) => {
+      console.log(error);
+      setOpen(true);
+
+      setTimeout(() => {
+        setOpen(false);
+      }, 4000);
+    },
+  });
+
+  const handleSfiCreate = (newSFIData: object) => {
+    createSFIMutation.mutate(newSFIData);
+  };
+
+  const openSfiUpdate = ({ prevData }: { prevData: SfiModel }) => {
+    setSelectedRowData(prevData);
+    setOpenUpdate(true);
+  };
+
   const updateSFIMutation = useMutation({
     mutationFn: async (data: { sfiId: string; newSFIData: object }) => {
       setOpen(true);
@@ -56,16 +97,33 @@ function SfiList() {
 
       setTimeout(() => {
         setOpen(false);
+        window.location.reload();
       }, 4000);
     },
-    onError: () => {
+    onError: (error: CustomError) => {
       setOpen(true);
 
       setTimeout(() => {
         setOpen(false);
       }, 4000);
+      return error;
     },
   });
+
+  const handleSfiUpdate = ({
+    id,
+    unique_number,
+  }: {
+    id: string;
+    unique_number: string;
+  }) => {
+    updateSFIMutation.mutate({
+      sfiId: id,
+      newSFIData: {
+        unique_number: unique_number,
+      },
+    });
+  };
 
   const deleteSFIMutation = useMutation({
     mutationFn: async (sfiId: string) => {
@@ -81,39 +139,19 @@ function SfiList() {
       setTimeout(() => {
         setOpen(false);
       }, 4000);
+      window.location.reload();
     },
-    onError: () => {
+    onError: (error: CustomError) => {
+      console.log(error);
       setOpen(true);
-
       setTimeout(() => {
         setOpen(false);
       }, 4000);
     },
   });
 
-  const handleSfiUpdate = ({
-    id,
-    unique_number,
-  }: {
-    id: string;
-    unique_number: string;
-  }) => {
-    console.log(id);
-    console.log(unique_number);
-
-    // updateSFIMutation.mutate({sfiId: id, newSFIData: {
-    //   unique_number: unique_number
-    // }});
-  };
-
-  const openSfiUpdate = ({ prevData }: { prevData: SfiModel }) => {
-    setSelectedRowData(prevData);
-    setOpenUpdate(true);
-  };
-
   const handleSfiDelete = (id: string) => {
-    console.log(id);
-    // deleteSFIMutation.mutate(id);
+    deleteSFIMutation.mutate(id);
   };
 
   const openSfiDelete = ({ prevData }: { prevData: SfiModel }) => {
@@ -192,8 +230,8 @@ function SfiList() {
           ...col,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           cell: (props: any) => (
-            <ActionsButton
-              row={props.row}
+            <SfiActionsButton
+              props={props}
               openSfiUpdate={openSfiUpdate}
               openSfiDelete={openSfiDelete}
             />
@@ -221,73 +259,95 @@ function SfiList() {
 
   const rowModel = tableInstance.getRowModel();
 
-  const createSFIMutation = useMutation({
-    mutationFn: async (newSFIData: object) => {
-      setOpen(true);
-      return await SfiService.addSfi(
-        { ...newSFIData },
-        {
-          Authorization: `Bearer ${state.tokens?.access}`,
-          "Content-Type": "application/json",
-        }
-      );
-    },
-    onSuccess: () => {
-      setOpen(true);
-
-      setTimeout(() => {
-        setOpen(false);
-      }, 4000);
-    },
-    onError: () => {
-      setOpen(true);
-
-      setTimeout(() => {
-        setOpen(false);
-      }, 4000);
-    },
-  });
-
-  const handleSfiCreate = (newSFIData: object) => {
-    createSFIMutation.mutate(newSFIData);
-  };
-
-  // const handleOperation = (
-  // 	event: SyntheticEvent,
-  // 	index: number,
-  // 	operation: "create" | "update" | "delete"
-  // ) => {
-  // 	event.preventDefault();
-
-  // 	if (operation === "create") {
-  // 		setOpenCreate(true);
-
-  // 		setOperation(operation);
-  // 	}
-
-  // 	if (operation === "update") {
-  // 		setOpenUpdate(true);
-
-  // 		setOperation(operation);
-
-  // 		setSelectedRow(index);
-
-  // 		setSelectedRowData(sfis[index]);
-  // 	}
-
-  // 	if (operation === "delete") {
-  // 		setOpenDelete(true);
-
-  // 		setOperation(operation);
-
-  // 		setSelectedRow(index);
-
-  // 		setSelectedRowData(sfis[index]);
-  // 	}
-  // };
-
   return (
     <>
+      {createSFIMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Updating SFI ..."
+        />
+      )}
+
+      {createSFIMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={createSFIMutation.error.response?.statusText}
+          errorMessage={
+            createSFIMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {createSFIMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="SFI Added successfully!"
+        />
+      )}
+
+      {updateSFIMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Updating SFI ..."
+        />
+      )}
+
+      {updateSFIMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={updateSFIMutation.error.response?.statusText}
+          errorMessage={
+            updateSFIMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {updateSFIMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="SFi Updated successfully!"
+        />
+      )}
+
+      {deleteSFIMutation.isPending && open && (
+        <LoadingModal
+          open={open}
+          setOpen={setOpen}
+          loadingMessage="Deleting SFI ..."
+        />
+      )}
+
+      {deleteSFIMutation.isError && open && (
+        <ErrorModal
+          open={open}
+          setOpen={setOpen}
+          errorTitle={deleteSFIMutation.error.response?.statusText}
+          errorMessage={
+            deleteSFIMutation.error.errorMessage ??
+            "Something went wrong. Please try again later."
+          }
+        />
+      )}
+
+      {deleteSFIMutation.isSuccess && open && (
+        <SuccessModal
+          open={open}
+          setOpen={setOpen}
+          successTitle="Sucess!"
+          successMessage="SFi deleted successfully!"
+        />
+      )}
+
       <div>
         <div className="mb-4 col-span-full xl:mb-2">
           <nav className="flex mb-5" aria-label="Breadcrumb">

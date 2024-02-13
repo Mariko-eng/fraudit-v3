@@ -11,6 +11,8 @@ import { MdGeneratingTokens } from "react-icons/md";
 import { TbFolder } from "react-icons/tb";
 import { TbPointFilled } from "react-icons/tb";
 import { SfiModel } from "../../../../models/sfi";
+import SearchComponent from "../../../search";
+import { toggleSearch } from "../../../../redux/slices/search";
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -20,6 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
   const dispatch = useAppDispatch();
 
   const { user } = useAppSelector((store) => store.auth);
+
+  const search = useAppSelector((store) => store.search);
 
   return (
     <>
@@ -55,10 +59,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                         </svg>
                       </div>
                       <input
+                        onClick={() => {
+                          dispatch(toggleSidebar(false));
+                          dispatch(toggleSearch(!search.isOpen));
+                        }}
                         type="text"
-                        name="email"
+                        name="search"
                         id="mobile-search"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-200 dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        value={""}
+                        onChange={() => {}}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder="Search"
                       />
                     </div>
@@ -184,15 +194,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                   </li>
                 )}
 
-                <hr/>
+                <hr />
                 <li>
                   <SidebarItem
                     itemName="Reports"
                     icon={<TbFolder />}
                     children={
                       <>
-                        <SidebarChildItem linkString={"/home/reports/incidents"}itemName="Incidents"/>
-                        <SidebarChildItem linkString={"/home/reports/suspects"} itemName="Suspects" />
+                        <SidebarChildItem
+                          linkString={"/home/reports/incidents"}
+                          itemName="Incidents"
+                        />
+                        <SidebarChildItem
+                          linkString={"/home/reports/suspects"}
+                          itemName="Suspects"
+                        />
                       </>
                     }
                   />
@@ -203,13 +219,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                     icon={<MdAutoGraph />}
                     children={
                       <>
-                      <div className="mx-3">
+                        <div className="mx-3">
                           <SidebarItem
                             itemName="Graphs"
                             icon={<TbPointFilled />}
                             children={
                               <>
-                              <SidebarChildItem
+                                <SidebarChildItem
                                   linkString={"analytics/graphs/month"}
                                   itemName="By Month"
                                 />
@@ -221,19 +237,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                                   linkString={"analytics/graphs/sub_category"}
                                   itemName="By Sub Category"
                                 />
-                                 <SidebarChildItem
+                                <SidebarChildItem
                                   linkString={"analytics/graphs/sfi"}
                                   itemName="By SFI/Bank"
-                                />
-                                <SidebarChildItem
-                                  linkString={"analytics/graphs/general"}
-                                  itemName="General"
                                 />
                               </>
                             }
                           />
                         </div>
-                        <div className="mx-3">
+
+                        {/* <div className="mx-3">
                           <SidebarItem
                             itemName="Stats"
                             icon={<TbPointFilled />}
@@ -262,14 +275,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                               </>
                             }
                           />
-                        </div>
+                        </div> */}
                       </>
                     }
                   />
                 </li>
               </ul>
 
-              <div className="pt-2 space-y-2">
+              {/* <div className="pt-2 space-y-2">
                 <a
                   href="https://flowbite.com/docs/getting-started/introduction/"
                   target="_blank"
@@ -292,7 +305,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
                     Docs
                   </span>
                 </a>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -534,6 +547,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen }) => {
         className="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90"
         id="sidebarBackdrop"
       ></div>
+
+      <SearchComponent />
     </>
   );
 };

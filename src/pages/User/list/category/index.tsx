@@ -4,12 +4,7 @@ import { useCallback, useState } from "react";
 import { useAppSelector } from "../../../../redux/hooks";
 import { useEffect, useMemo } from "react";
 import { TbArrowsSort } from "react-icons/tb";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { USERCOLUMNS } from "../../columns";
 import UserTableHeader from "../../header";
 import { UserModel, UserListModel } from "../../../../models/user";
@@ -22,9 +17,7 @@ function UsersByCategoryList() {
 
   const state = useAppSelector((store) => store.auth);
 
-  const [usersListData, setUsersListData] = useState<UserListModel | null>(
-    null
-  );
+  const [responseData, setResponseData] = useState<UserListModel | null>(null);
 
   const [tableData, setTableData] = useState<UserModel[]>([]);
 
@@ -70,19 +63,19 @@ function UsersByCategoryList() {
   useEffect(() => {
     if (searchParams.trim() === "") {
       const userData: UserListModel = usersQuery.data as UserListModel;
-      setUsersListData(userData);
+      setResponseData(userData);
       setTableData(userData.results);
     } else {
       const userData: UserListModel = userSearchQuery.data as UserListModel;
 
-      setUsersListData(userData);
+      setResponseData(userData);
       setTableData(userData.results);
     }
   }, [
     searchParams,
     usersQuery,
     userSearchQuery,
-    setUsersListData,
+    setResponseData,
     setTableData,
   ]);
 
@@ -200,16 +193,13 @@ function UsersByCategoryList() {
         </nav>
       </div>
 
-      {usersQuery.isLoading ? (
-        <div className="text-yellow-400">Loading</div>
-      ) : usersQuery.isError ? (
-        <div className="text-red-400">Something Went Wrong!</div>
-      ) : usersQuery.isSuccess ? (
+      {responseData ? (
         <div>
-          {usersListData ? (
+          {responseData ? (
             <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
               <UserTableHeader
-                totalNo={usersListData.count ? usersListData.count : 0}
+                newUserLink=""
+                totalNo={responseData.count ? responseData.count : 0}
                 searchParams={searchParams}
                 handleSearch={handleSearch}
               />
@@ -266,65 +256,67 @@ function UsersByCategoryList() {
               </div>
 
               <br />
-              <div>
-                <p>
-                  Page{" "}
-                  <span>
-                    {currentPage} of {""} {usersListData.total}
-                  </span>
-                </p>
-                <nav aria-label="Page navigation example">
-                  <ul className="inline-flex -space-x-px text-sm">
-                    <li>
-                      <button
-                        onClick={() => {
-                          setCurrentPage((prev) => {
-                            if (prev > 1) {
-                              return prev - 1;
-                            } else {
-                              return 1;
-                            }
-                          });
-                        }}
-                        disabled={usersListData.previous === null}
-                        className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                      >
-                        Previous
-                      </button>
-                    </li>
-                    {[...Array(usersListData.total).keys()].map((index) => (
-                      <li key={index}>
+              {responseData.total && (
+                <div>
+                  <p>
+                    Page{" "}
+                    <span>
+                      {currentPage} of {""} {responseData.total}
+                    </span>
+                  </p>
+                  <nav aria-label="Page navigation example">
+                    <ul className="inline-flex -space-x-px text-sm">
+                      <li>
                         <button
                           onClick={() => {
-                            setCurrentPage(index + 1);
+                            setCurrentPage((prev) => {
+                              if (prev > 1) {
+                                return prev - 1;
+                              } else {
+                                return 1;
+                              }
+                            });
                           }}
-                          className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                          disabled={responseData.previous === null}
+                          className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                         >
-                          {index + 1}
+                          Previous
                         </button>
                       </li>
-                    ))}
-                    <li>
-                      <button
-                        onClick={() => {
-                          setCurrentPage((prev) => prev + 1);
-                        }}
-                        disabled={usersListData.next === null}
-                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
+                      {[...Array(responseData.total).keys()].map((index) => (
+                        <li key={index}>
+                          <button
+                            onClick={() => {
+                              setCurrentPage(index + 1);
+                            }}
+                            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                          >
+                            {index + 1}
+                          </button>
+                        </li>
+                      ))}
+                      <li>
+                        <button
+                          onClick={() => {
+                            setCurrentPage((prev) => prev + 1);
+                          }}
+                          disabled={responseData.next === null}
+                          className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                        >
+                          Next
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              )}
             </div>
           ) : (
             <p>Loading....</p>
           )}
         </div>
       ) : (
-        <></>
+        <p>Loading....</p>
       )}
     </div>
   );

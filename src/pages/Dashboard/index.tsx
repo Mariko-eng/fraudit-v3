@@ -23,7 +23,7 @@ const Dashboard: React.FC<MyComponentProps> = () => {
           },
         });
 
-        console.log(response.data);
+        // console.log(response.data);
 
         setData(response.data as DashboardDataModel);
       } catch (e) {
@@ -73,8 +73,29 @@ const Dashboard: React.FC<MyComponentProps> = () => {
 
   const statusPieChartOptions: ApexOptions = useMemo(() => {
     if (data) {
-      const labels = data.results.top_status?.map((item) => item.status) || [];
+      const rawLabels =
+        data.results.top_status?.map((item) => item.status) || [];
+
       const series = data.results.top_status?.map((item) => item.count) || [];
+
+      const desiredLabelOrder = ["SUSPICION", "GREY", "BLACK"];
+
+      // Sort labels and series based on the desired order
+      const labelsAndSeries = desiredLabelOrder.map((label) => {
+        const index = rawLabels.indexOf(label);
+        return {
+          label,
+          count: index !== -1 ? series[index] : 0,
+        };
+      });
+
+      // Extract sorted labels and series
+      const sortedLabels = labelsAndSeries.map((item) => item.label);
+      const sortedSeries = labelsAndSeries.map((item) => item.count);
+
+      const fillColors = ["#6291AE", "#0143F6", "#010000"];
+
+      const colors = ["blue", "grey", "black"];
 
       return {
         chart: {
@@ -85,17 +106,17 @@ const Dashboard: React.FC<MyComponentProps> = () => {
           },
         },
         dataLabels: {
-          enabled: false,
+          enabled: true,
         },
         fill: {
-          colors: ["#0143F6", "#6291AE", "#010000"],
+          colors: fillColors,
         },
-        labels: labels,
-        series: series,
+        colors: colors,
+        labels: sortedLabels,
+        series: sortedSeries,
         title: {
           text: "Incident Status",
         },
-        colors: ["grey", "blue", "black"],
         legend: {
           show: true,
         },
@@ -236,7 +257,9 @@ const Dashboard: React.FC<MyComponentProps> = () => {
               {data.results.top_categories.map((item, index) => (
                 <div key={index} className="flex flex-col">
                   <div className="flex justify-between">
-                    <p className="text-sm">{item.category.substring(0,15)}...</p>
+                    <p className="text-sm">
+                      {item.category.substring(0, 15)}...
+                    </p>
                     <p className="text-sm text-blue-500 font-semibold">
                       {item.count}
                     </p>
@@ -250,7 +273,9 @@ const Dashboard: React.FC<MyComponentProps> = () => {
               {data.results.top_sub_categories.map((item, index) => (
                 <div key={index} className="flex flex-col">
                   <div className="flex justify-between">
-                    <p className="text-sm">{item.sub_category.substring(0,15)}...</p>
+                    <p className="text-sm">
+                      {item.sub_category.substring(0, 15)}...
+                    </p>
                     <p className="text-sm text-blue-500 font-semibold">
                       {item.count}
                     </p>

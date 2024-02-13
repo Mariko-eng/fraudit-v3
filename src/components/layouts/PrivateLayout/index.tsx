@@ -70,7 +70,8 @@ function PrivateLayout() {
         {/*<!-- End Sidebar -->*/}
 
         {/*<!-- Content -->*/}
-        <Overlay loading={sidebar.isOpen}>
+        <Overlay loading={sidebar.isOpen}
+        >
           <div className="w-full h-screen bg-grey-50 pt-16  sm:px-6 md:px-8 lg:pl-64 lg:pr-0 overflow-auto">
             <Main />
             <AppFooter />

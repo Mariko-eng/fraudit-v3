@@ -1,31 +1,12 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
-import ActionsButton from "./actions";
+import { SfiActionsButton }  from "./actions";
 import { SfiModel } from "../../../models/sfi";
 
 const columnHelper = createColumnHelper<SfiModel>();
 
 export const SFICOLUMNS = [
   // Display Column
-  columnHelper.display({
-    id: "select",
-    header: (props) => (
-      <input
-        type="checkbox"
-        checked={props.table.getIsAllRowsSelected()}
-        onChange={props.table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: (props) => (
-      <input
-        type="checkbox"
-        checked={props.row.getIsSelected()}
-        disabled={!props.row.getCanSelect()}
-        onChange={props.row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
-
   columnHelper.accessor("id", {
     id: "id",
     header: "ID",
@@ -59,6 +40,6 @@ export const SFICOLUMNS = [
     id: "actions",
     header: "Actions",
     footer: "Actions",
-    cell: (props) => <ActionsButton row={props.row} openSfiUpdate={() => {}} openSfiDelete={() => {}} />,
+    cell: (props) => <SfiActionsButton props={props} openSfiUpdate={() => {}} openSfiDelete={() => {}} />,
   }),
 ];

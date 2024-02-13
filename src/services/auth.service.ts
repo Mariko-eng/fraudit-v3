@@ -37,6 +37,33 @@ const verifyOtp = (data: object, headers: object) => {
   });
 };
 
+const getUserByEmail = async(
+	email: string,
+) => {
+	return await APIAUTH.get(`/users/?search=${email}`).then((response) => response.data);
+}
+
+const resetPasswordRequest = async(
+	email: string,
+	password: string,
+) => {
+	return await APIAUTH.post(
+		"/api/users/reset-password/",
+		{ user: { email, password } },
+	);
+}
+
+const forgotPasswordRequest = async(
+	email: string | undefined,
+) => {
+	return await APIAUTH.post(
+		"/api/users/forgot-password/",
+		{ user: { email: email, frontend_url: `${window.location.href.split("/forgot-password")[0]}/reset-password` } },
+	);
+}
+
+
+
 const logout = () => {
   localStorage.clear()
   // localStorage.removeItem("user");
@@ -55,21 +82,16 @@ const getCurrentUser = () => {
   return JSON.parse(userString);
 };
 
-const register = (username: string, email: string, password: string) => {
-  return APIAUTH.post("signup", {
-    username,
-    email,
-    password,
-  });
-};
-
 const AuthService = {
   login,
   requestOtp,
   verifyOtp,
   logout,
-  register,
   getCurrentUser,
+
+  getUserByEmail,
+  resetPasswordRequest,
+  forgotPasswordRequest
 };
 
 export default AuthService;

@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import  sidebarReducer from "./slices/sidebar"
+import  searchReducer from "./slices/search"
 import  authReducer from "./slices/auth"
 import  messageReducer from "./slices/message"
 
 const reducer = {
   auth: authReducer,
   message: messageReducer,
-  sidebar: sidebarReducer
+  sidebar: sidebarReducer,
+  search: searchReducer
 }
 
 export const store = configureStore({

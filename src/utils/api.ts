@@ -4,7 +4,6 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 import AuthService from "../services/auth.service";
 export interface CustomError extends AxiosError {
   errorMessage?: string;
-  errorDetail?: string;
 }
 
 export const APIAUTH = axios.create({
@@ -33,7 +32,21 @@ API.interceptors.response.use(
       window.location.reload();
     }
 
-    return Promise.reject(error);
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+
+    const interceptedError: CustomError = {
+      ...error,
+      errorMessage:
+        error.response?.data[0] ??
+        error.response?.data?.error ??
+        error.response?.data?.message ??
+        error.response?.data?.detail,
+    };
+
+    return Promise.reject(interceptedError);
+
+    // return Promise.reject(error);
   }
 );
 
@@ -83,7 +96,8 @@ API.interceptors.request.use(
     return config;
   },
   function (error) {
-    // Do something with request error
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
     return Promise.reject(error);
   }
 );

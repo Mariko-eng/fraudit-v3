@@ -157,6 +157,9 @@ const IncidentDetail = () => {
     }
   };
 
+  console.log("created_by",incident?.created_by)
+  console.log("user",user)
+
 
   return (
     <>

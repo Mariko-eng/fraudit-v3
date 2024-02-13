@@ -5,11 +5,15 @@ import { toggleSidebar } from "../../../../redux/slices/sidebar";
 import Logo from "./../../../../assets/UBALogoOnlyLight.png";
 import Dp from "./../../../../assets/dp.png";
 import { SfiModel } from "../../../../models/sfi";
+import SearchComponent from "../../../search";
+import { toggleSearch } from "../../../../redux/slices/search";
 
 const Header = () => {
+  const { user } = useAppSelector((store) => store.auth);
+
   const sidebar = useAppSelector((store) => store.sidebar);
 
-  const { user } = useAppSelector((store) => store.auth);
+  const search = useAppSelector((store) => store.search);
 
   const dispatch = useAppDispatch();
 
@@ -63,9 +67,7 @@ const Header = () => {
                   FraudIT
                 </span>
               </a>
-              <form
-                action="#"
-                method="GET"
+              <div
                 className="hidden lg:block lg:pl-3.5"
               >
                 <label htmlFor="topbar-search" className="sr-only">
@@ -87,19 +89,22 @@ const Header = () => {
                     </svg>
                   </div>
                   <input
+                    onClick={() => dispatch(toggleSearch(!search.isOpen))}
                     type="text"
-                    name="email"
+                    name="search"
                     id="topbar-search"
+                    value={""}
+                    onChange={() => {}}
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Search"
                   />
                 </div>
-              </form>
+              </div>
             </div>
 
             <div className="flex items-center">
               <div className="hidden mr-3 -mb-1 sm:block">
-                <a
+                {/* <a
                   className="github-button"
                   href=""
                   data-color-scheme="no-preference: dark; light: light; dark: light;"
@@ -109,12 +114,13 @@ const Header = () => {
                   aria-label="Star themesberg/flowbite-admin-dashboard on GitHub"
                 >
                   Star
-                </a>
+                </a> */}
               </div>
               {/*<!-- ========== Search mobile  ========== -->*/}
               <button
                 id="toggleSidebarMobileSearch"
                 type="button"
+                onClick={() => dispatch(toggleSearch(!search.isOpen))}
                 className="p-2 text-gray-500 rounded-lg lg:hidden hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 <span className="sr-only">Search</span>
@@ -133,24 +139,9 @@ const Header = () => {
                 </svg>
               </button>
               {/*<!-- ========== Notifications  ========== -->*/}
-              <button
-                type="button"
-                data-dropdown-toggle="notification-dropdown"
-                className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700"
-              >
-                <span className="sr-only">View notifications</span>
-                {/*<!-- ========== Bell icon  ========== -->*/}
-                <svg
-                  className="w-6 h-6"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
-                </svg>
-              </button>
+
               {/*<!-- ========== Dropdown menu  ========== -->*/}
-              <div
+              {/* <div
                 className="z-20 z-50 hidden max-w-sm my-4 overflow-hidden text-base list-none bg-white divide-y divide-gray-100 rounded shadow-lg dark:divide-gray-600 dark:bg-gray-700"
                 id="notification-dropdown"
               >
@@ -203,7 +194,7 @@ const Header = () => {
                     View all
                   </div>
                 </a>
-              </div>
+              </div> */}
               {/*<!-- ========== New  ========== -->*/}
               <div className="flex items-center ml-3">
                 <div>
@@ -285,6 +276,8 @@ const Header = () => {
           </div>
         </div>
       </nav>
+
+      <SearchComponent />
     </>
   );
 };

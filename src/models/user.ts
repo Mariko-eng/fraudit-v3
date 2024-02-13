@@ -2,21 +2,21 @@ import { APIResponseList } from "./apiResponseList";
 import { SfiModel } from "./sfi";
 
 export interface CreatedByUserModel {
-  email?: string | undefined;
+  id: string;
 
-  id?: string | number | undefined;
+  email: string;
 
-  is_active?: boolean | undefined;
+  is_active: boolean;
 
-  national_id?: string | undefined;
+  national_id: string;
 
-  phone_number?: string | undefined;
+  phone_number: string ;
 
-  sfi?: SfiModel | string | number | undefined;
+  sfi: SfiModel | string;
 
-  user_category?: string | number | undefined;
+  user_category: string;
 
-  user_type?: string | number | undefined;
+  user_type: string | undefined;
 }
 
 export interface UserModel {

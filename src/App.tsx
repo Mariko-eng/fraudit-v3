@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import PublicLayout from "./components/layouts/PublicLayout";
 import Protectedlayout from "./components/layouts/ProtectedLayout";
 import PrivateLayout from "./components/layouts/PrivateLayout";
 import IncidentList from "./pages/Incident/list";
@@ -33,6 +32,13 @@ import AnalyticsStatsCategory from "./pages/Analytics/stats/category";
 import AnalyticsStatsSubCategory from "./pages/Analytics/stats/sub_category";
 import IncidentReports from "./pages/Reports/incidents";
 import SuspectReports from "./pages/Reports/suspects";
+import NewUserRoot from "./pages/User/new/root";
+import NewUser from "./pages/User/new/user";
+import EditUser from "./pages/User/edit/user";
+import EditUserRoot from "./pages/User/edit/root";
+import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -61,24 +67,13 @@ const App = () => {
       ],
     },
     {
-      path: "about-us",
-      element: <PublicLayout />,
-      children: [
-        {
-          path: "",
-          element: <>About Us</>,
-        },
-      ],
+      path: "forgot-password",
+      element: <ForgotPassword />,
     },
+
     {
-      path: "faq",
-      element: <PublicLayout />,
-      children: [
-        {
-          path: "",
-          element: <>About Us</>,
-        },
-      ],
+      path: "reset-password",
+      element: <ResetPassword />,
     },
     {
       path: "home",
@@ -143,8 +138,28 @@ const App = () => {
           element: <UsersByCategoryList />,
         },
         {
-          path: "users/:id",
+          path: "users/detail/:id",
           element: <UserDetail />,
+        },
+
+        {
+          path: "users/new",
+          element: <NewUser />,
+        },
+
+        {
+          path: "users/:id/edit",
+          element: <EditUser />,
+        },
+
+        {
+          path: "users/new/root",
+          element: <NewUserRoot />,
+        },
+
+        {
+          path: "users/:id/edit/root",
+          element: <EditUserRoot />,
         },
 
         {
@@ -205,6 +220,10 @@ const App = () => {
           element: <SuspectReports />,
         },
       ],
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);
 

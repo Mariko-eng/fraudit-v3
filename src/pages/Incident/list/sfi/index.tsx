@@ -22,6 +22,10 @@ function IncidentBySFIList() {
 
   const state = useAppSelector((store) => store.auth);
 
+  const [responseData, setResponseData] = useState<IncidentListModel | null>(
+    null
+  );
+
   const [tableData, setTableData] = useState<IncidentModel[]>([]);
 
   const queryClient = useQueryClient();
@@ -94,17 +98,20 @@ function IncidentBySFIList() {
       const incidentData: IncidentListModel =
         incidentsQuery.data as IncidentListModel;
 
+      setResponseData(incidentData);
       setTableData(incidentData.results);
     } else {
       const incidentData: IncidentListModel =
         incidentsSearchQuery.data as IncidentListModel;
 
+      setResponseData(incidentData);
       setTableData(incidentData.results);
     }
   }, [
     searchParams,
     incidentsQuery.data,
     incidentsSearchQuery.data,
+    setResponseData,
     setTableData,
   ]);
 
@@ -223,12 +230,10 @@ function IncidentBySFIList() {
       </div>
 
       <div>
-        {incidentsQuery.data ? (
+        {responseData ? (
           <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
             <IncidentTableHeader
-              totalNo={
-                incidentsQuery.data.count ? incidentsQuery.data.count : 0
-              }
+              totalNo={responseData.count ? responseData.count : 0}
               searchParams={searchParams}
               handleSearch={handleSearch}
             />
@@ -285,58 +290,60 @@ function IncidentBySFIList() {
             </div>
 
             <br />
-            <div>
-              <p>
-                Page{" "}
-                <span>
-                  {currentPage} of {""} {incidentsQuery.data.total}
-                </span>
-              </p>
-              <nav aria-label="Page navigation example">
-                <ul className="inline-flex -space-x-px text-sm">
-                  <li>
-                    <button
-                      onClick={() => {
-                        setCurrentPage((prev) => {
-                          if (prev > 1) {
-                            return prev - 1;
-                          } else {
-                            return 1;
-                          }
-                        });
-                      }}
-                      disabled={incidentsQuery.data.previous === null}
-                      className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      Previous
-                    </button>
-                  </li>
-                  {[...Array(incidentsQuery.data.total).keys()].map((index) => (
-                    <li key={index}>
+            {responseData.total && (
+              <div>
+                <p>
+                  Page{" "}
+                  <span>
+                    {currentPage} of {""} {responseData.total}
+                  </span>
+                </p>
+                <nav aria-label="Page navigation example">
+                  <ul className="inline-flex -space-x-px text-sm">
+                    <li>
                       <button
                         onClick={() => {
-                          setCurrentPage(index + 1);
+                          setCurrentPage((prev) => {
+                            if (prev > 1) {
+                              return prev - 1;
+                            } else {
+                              return 1;
+                            }
+                          });
                         }}
-                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                        disabled={responseData.previous === null}
+                        className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                       >
-                        {index + 1}
+                        Previous
                       </button>
                     </li>
-                  ))}
-                  <li>
-                    <button
-                      onClick={() => {
-                        setCurrentPage((prev) => prev + 1);
-                      }}
-                      disabled={incidentsQuery.data.next === null}
-                      className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+                    {[...Array(responseData.total).keys()].map((index) => (
+                      <li key={index}>
+                        <button
+                          onClick={() => {
+                            setCurrentPage(index + 1);
+                          }}
+                          className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                        >
+                          {index + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li>
+                      <button
+                        onClick={() => {
+                          setCurrentPage((prev) => prev + 1);
+                        }}
+                        disabled={responseData.next === null}
+                        className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                      >
+                        Next
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
           </div>
         ) : (
           <p>Loading....</p>

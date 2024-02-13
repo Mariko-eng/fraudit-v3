@@ -15,8 +15,11 @@ const AnalyticsGraphMonth = () => {
   const [error, setError] = useState<string>("");
   const [isSingle, setIsSingle] = useState<boolean | null>(null);
 
-  const [dataSingle, setDataSingle] = useState<SingleMonthResultsModel | null>(null);
-  const [dataMultiple, setDataMultiple] =useState<MultipleMonthResultsModel | null>(null);
+  const [dataSingle, setDataSingle] = useState<SingleMonthResultsModel | null>(
+    null
+  );
+  const [dataMultiple, setDataMultiple] =
+    useState<MultipleMonthResultsModel | null>(null);
 
   // const [lineChartOptions, setLineChartOptions] = useState<ApexOptions>(initialLineChartOptions);
   // const [chartData, setChartData] = useState<ChartSeries[]>([]);
@@ -101,7 +104,7 @@ const AnalyticsGraphMonth = () => {
         title: {
           text: "Incident Status",
         },
-        colors: ["grey","blue", "black"],
+        colors: ["grey", "blue", "black"],
         legend: {
           show: true,
         },
@@ -127,7 +130,7 @@ const AnalyticsGraphMonth = () => {
       labels: [],
       series: [],
       title: {
-          text: "",
+        text: "",
       },
       colors: [],
       legend: {
@@ -247,11 +250,16 @@ const AnalyticsGraphMonth = () => {
     };
   }, [dataMultiple]);
 
-  const MSategorybarChartOptions: ApexOptions = useMemo(() => {
+  const [multiCategoryNames, setMultiCategoryNames] = useState<string[]>([]);
+
+  const MCategorybarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setMultiCategoryNames(
+        dataMultiple.results.category_incidents?.map((item) => item.category)
+      );
       const categoryLabels =
-        dataMultiple.results.category_incidents?.map((item) =>
-          item.category.substring(0, 4)
+        dataMultiple.results.category_incidents?.map(
+          (item, index) => `${item.category.substring(0, 4)}-${index}`
         ) || [];
       const categorySeries =
         dataMultiple.results.category_incidents?.map((item) => item.count) ||
@@ -288,11 +296,20 @@ const AnalyticsGraphMonth = () => {
     };
   }, [dataMultiple]);
 
+  const [multiSubCategoryNames, setMultiSubCategoryNames] = useState<string[]>(
+    []
+  );
+
   const MSubCategorybarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setMultiSubCategoryNames(
+        dataMultiple.results.sub_category_incidents?.map(
+          (item) => item.sub_category
+        )
+      );
       const categoryLabels =
-        dataMultiple.results.sub_category_incidents?.map((item) =>
-          item.sub_category.substring(0, 4)
+        dataMultiple.results.sub_category_incidents?.map(
+          (item, index) => `${item.sub_category.substring(0, 4)}-${index}`
         ) || [];
       const categorySeries =
         dataMultiple.results.sub_category_incidents?.map(
@@ -368,59 +385,20 @@ const AnalyticsGraphMonth = () => {
     };
   }, [dataMultiple]);
 
-  // Single Months Data
-  const barChartOptions: ApexOptions = useMemo(() => {
-    if (dataSingle) {
-      const monthCategories =
-        dataSingle.results.category_incidents?.map((item) =>
-          item.category.substring(0, 4)
-        ) || [];
-      const monthSeries =
-        dataSingle.results.category_incidents?.map((item) => item.count) || [];
-      const suspectSeries =
-        dataSingle.results.num_suspects_category?.map(
-          (item) => item.sum_num_individuals
-        ) || [];
+  // Single Months Data;
 
-      return {
-        chart: {
-          height: 350,
-          type: "bar",
-          zoom: {
-            enabled: true,
-          },
-        },
-        series: [
-          { name: "Incidents", data: monthSeries },
-          { name: "Suspects", data: suspectSeries },
-        ],
-        xaxis: {
-          categories: monthCategories,
-        },
-      };
-    }
-
-    // Return a default or empty options object if dataMultiple is not available
-    return {
-      chart: {
-        height: 350,
-        type: "bar",
-        zoom: {
-          enabled: true,
-        },
-      },
-      series: [],
-      xaxis: {
-        categories: [],
-      },
-    };
-  }, [dataSingle]);
+  const [singleCategoryNames, setSingleCategoryNames] = useState<string[]>([]);
 
   const SCategorylineChartOptions: ApexOptions = useMemo(() => {
     if (dataSingle) {
+      setSingleCategoryNames(
+        dataSingle.results.category_incidents?.map((item) => item.category)
+      );
+
       const labels =
-        dataSingle.results.category_incidents?.map((item) => item.category.substring(0,4)) ||
-        [];
+        dataSingle.results.category_incidents?.map((item,index) =>
+          `${item.category.substring(0, 4)}-${index}`
+        ) || [];
       const incidentSeries =
         dataSingle.results.category_incidents?.map((item) => item.count) || [];
       const individualSeries =
@@ -462,13 +440,25 @@ const AnalyticsGraphMonth = () => {
     };
   }, [dataSingle]);
 
+  const [singleSubCategoryNames, setSingleSubCategoryNames] = useState<
+    string[]
+  >([]); 
+
   const SSubCategorylineChartOptions: ApexOptions = useMemo(() => {
     if (dataSingle) {
+      setSingleSubCategoryNames(
+        dataSingle.results.sub_category_incidents?.map(
+          (item) => item.sub_category
+        )
+      );
+
       const labels =
-        dataSingle.results.sub_category_incidents?.map((item) => item.sub_category.substring(0,4)) ||
-        [];
+        dataSingle.results.sub_category_incidents?.map((item, index) =>
+          `${item.sub_category.substring(0, 4)}-${index}`
+        ) || [];
       const incidentSeries =
-        dataSingle.results.sub_category_incidents?.map((item) => item.count) || [];
+        dataSingle.results.sub_category_incidents?.map((item) => item.count) ||
+        [];
       const individualSeries =
         dataSingle.results.num_suspects_sub_category?.map(
           (item) => item.sum_num_individuals
@@ -645,31 +635,73 @@ const AnalyticsGraphMonth = () => {
             ) : isSingle === true ? (
               <>
                 <div>
-                  <h5>Single</h5>
-                  <div>
-                    <ReactApexChart
-                      options={barChartOptions}
-                      series={barChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+                  <h5>{selectedMonth}</h5>
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - categories
+                      </div>
+                      <ReactApexChart
+                        options={SCategorylineChartOptions}
+                        series={SCategorylineChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {singleCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={SCategorylineChartOptions}
-                      series={SCategorylineChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+
+                  <hr />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - categories
+                      </div>
+                      <ReactApexChart
+                        options={SSubCategorylineChartOptions}
+                        series={SSubCategorylineChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {singleSubCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={SSubCategorylineChartOptions}
-                      series={SSubCategorylineChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
-                  </div>
+                  <hr />
                 </div>
               </>
             ) : (
@@ -694,37 +726,101 @@ const AnalyticsGraphMonth = () => {
                       />
                     </div>
                   </div>
+                  <hr />
+
                   <div>
-                    <ReactApexChart
-                      options={MMonthslineChartOptions}
-                      series={MMonthslineChartOptions.series}
-                      type="line"
-                      height={250}
-                    />
+                    <div className="font-bold my-1">
+                      Incidents - Monthly Trend
+                    </div>
+                    <div>
+                      <ReactApexChart
+                        options={MMonthslineChartOptions}
+                        series={MMonthslineChartOptions.series}
+                        type="line"
+                        height={250}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={MSategorybarChartOptions}
-                      series={MSategorybarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+
+                  <hr />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - categories
+                      </div>
+                      <ReactApexChart
+                        options={MCategorybarChartOptions}
+                        series={MCategorybarChartOptions.series}
+                        type="bar"
+                        height={300}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {multiCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={MSubCategorybarChartOptions}
-                      series={MSubCategorybarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+                  <hr />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - Sub categories
+                      </div>
+                      <ReactApexChart
+                        options={MSubCategorybarChartOptions}
+                        series={MSubCategorybarChartOptions.series}
+                        type="bar"
+                        height={300}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {multiSubCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
+
+                  <hr />
+
                   <div>
-                    <ReactApexChart
-                      options={MSfibarChartOptions}
-                      series={MSfibarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+                    <div className="font-bold my-1">Incidents - SFIs</div>
+                    <div>
+                      <ReactApexChart
+                        options={MSfibarChartOptions}
+                        series={MSfibarChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
                   </div>
                 </div>
               </>

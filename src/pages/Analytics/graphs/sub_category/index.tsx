@@ -103,8 +103,16 @@ const AnalyticsGraphSubCategory = () => {
   };
 
   // Multiple Data
+  const [amtSubCategoryNames, setAmtSubCategoryNames] = useState<string[]>([]);
+
   const MAmtbarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setAmtSubCategoryNames(
+        dataMultiple.results.actual_amt_sub_category?.map(
+          (item) => item.sub_category
+        )
+      );
+
       const categoryLabels =
         dataMultiple.results.actual_amt_sub_category?.map((item) =>
           item.sub_category.substring(0, 4)
@@ -145,8 +153,16 @@ const AnalyticsGraphSubCategory = () => {
     };
   }, [dataMultiple]);
 
+  const [numSubCategoryNames, setNumSubCategoryNames] = useState<string[]>([]);
+
   const MSuspectsbarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setNumSubCategoryNames(
+        dataMultiple.results.num_suspects_sub_category?.map(
+          (item) => item.sub_category
+        )
+      );
+
       const categoryLabels =
         dataMultiple.results.num_suspects_sub_category?.map((item) =>
           item.sub_category.substring(0, 4)
@@ -550,22 +566,73 @@ const AnalyticsGraphSubCategory = () => {
               <>
                 <div>
                   <h5>Multiple</h5>
-                  <div>
-                    <ReactApexChart
-                      options={MAmtbarChartOptions}
-                      series={MAmtbarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - Average Amounts
+                      </div>
+                      <ReactApexChart
+                        options={MAmtbarChartOptions}
+                        series={MAmtbarChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {amtSubCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={MSuspectsbarChartOptions}
-                      series={MSuspectsbarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+
+                  <hr />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - Number Of Suspects
+                      </div>
+                      <ReactApexChart
+                        options={MSuspectsbarChartOptions}
+                        series={MSuspectsbarChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {numSubCategoryNames.map(
+                          (item: string, index: number) => (
+                            <div key={index} className="flex">
+                              <div
+                                className="text-xs"
+                                style={{ width: "50px" }}
+                              >{`${item.substring(0, 4)}-${index}`}</div>
+                              <div className="text-xs text-blue-500">
+                                - {item}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
+                  <hr />
                 </div>
               </>
             )}

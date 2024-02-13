@@ -1,31 +1,31 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { IncidentModel } from "../../models/incident";
-import ActionsButton from "./actions";
 import { Link } from "react-router-dom";
+import { IncidentActionsButton } from "./actions";
 
 const incidentColumnHelper = createColumnHelper<IncidentModel>();
 
 export const INCIDENTCOLUMNS = [
   // Display Column
-  incidentColumnHelper.display({
-    id: "select",
-    header: (props) => (
-      <input
-        type="checkbox"
-        checked={props.table.getIsAllRowsSelected()}
-        onChange={props.table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: (props) => (
-      <input
-        type="checkbox"
-        checked={props.row.getIsSelected()}
-        disabled={!props.row.getCanSelect()}
-        onChange={props.row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+  // incidentColumnHelper.display({
+  //   id: "select",
+  //   header: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.table.getIsAllRowsSelected()}
+  //       onChange={props.table.getToggleAllRowsSelectedHandler()}
+  //     />
+  //   ),
+  //   cell: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.row.getIsSelected()}
+  //       disabled={!props.row.getCanSelect()}
+  //       onChange={props.row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
 
   incidentColumnHelper.accessor("id", {
     id: "id",
@@ -113,7 +113,7 @@ export const INCIDENTCOLUMNS = [
     id: "actions",
     header: "Actions",
     footer: "Actions",
-    cell: (props) => <ActionsButton row={props.row} />,
+    cell: (props) => <IncidentActionsButton props={props} />,
   }),
 ];
 

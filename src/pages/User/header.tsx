@@ -1,11 +1,15 @@
 import { ChangeEvent } from "react";
 import { BsPlusCircleFill } from "react-icons/bs";
+import { Link } from "react-router-dom";
+
 
 const UserTableHeader = ({
+  newUserLink,
   totalNo,
   searchParams,
   handleSearch,
 }: {
+  newUserLink: string;
   totalNo: number;
   searchParams: string;
   handleSearch: (value: string) => void;
@@ -18,19 +22,25 @@ const UserTableHeader = ({
     <div className="bg-white dark:bg-gray-800 relative sm:rounded-lg">
       <div className="w-full my-2 md:flex-row flex justify-between items-center">
         <h5 className="mx-3 text-gray-500">
-          All Users :<span className="ml-1 text-black font-medium">{totalNo}</span>
+          All Users :
+          <span className="ml-1 text-black font-medium">{totalNo}</span>
         </h5>
-        <button className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center">
-          <span className="mx-1">
-            <BsPlusCircleFill />
-          </span>
-           New User
-        </button>
+        {newUserLink !== "" && (
+          <Link
+            to={newUserLink}
+            className="bg-[#00AFD7] p-2 text-white rounded flex items-center justify-center"
+          >
+            <span className="mx-1">
+              <BsPlusCircleFill />
+            </span>
+            Add User
+          </Link>
+        )}
       </div>
       <hr />
 
       <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-full">
           <form className="flex items-center">
             <label htmlFor="simple-search" className="sr-only">
               Search
@@ -62,7 +72,7 @@ const UserTableHeader = ({
             </div>
           </form>
         </div>
-        <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+        {/* <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
           <div className="flex items-center space-x-3 w-full md:w-auto">
             <button
               id="actionsDropdownButton"
@@ -229,7 +239,7 @@ const UserTableHeader = ({
               </ul>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

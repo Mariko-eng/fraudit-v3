@@ -100,8 +100,14 @@ const AnalyticsGraphCategory = () => {
   };
 
   // Multiple Data
+  const [amtCategoryNames, setAmtCategoryNames] = useState<string[]>([]);
+
   const MAmtCategorybarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setAmtCategoryNames(
+        dataMultiple.results.actual_amt_category?.map((item) => item.category)
+      );
+
       const categoryLabels =
         dataMultiple.results.actual_amt_category?.map((item) =>
           item.category.substring(0, 4)
@@ -140,10 +146,16 @@ const AnalyticsGraphCategory = () => {
         categories: [],
       },
     };
-  }, [dataMultiple]);
+  }, [dataMultiple]); 
 
+  const [numCategoryNames, setNumCategoryNames] = useState<string[]>([]);
+  
   const MSuspectsCategorybarChartOptions: ApexOptions = useMemo(() => {
     if (dataMultiple) {
+      setNumCategoryNames(
+        dataMultiple.results.num_suspects_category?.map((item) => item.category)
+      );
+
       const categoryLabels =
         dataMultiple.results.num_suspects_category?.map((item) =>
           item.category.substring(0, 4)
@@ -603,22 +615,69 @@ const AnalyticsGraphCategory = () => {
               <>
                 <div>
                   <h5>Multiple</h5>
-                  <div>
-                    <ReactApexChart
-                      options={MAmtCategorybarChartOptions}
-                      series={MAmtCategorybarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - Average Amounts
+                      </div>
+                      <ReactApexChart
+                        options={MAmtCategorybarChartOptions}
+                        series={MAmtCategorybarChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {amtCategoryNames.map((item: string, index: number) => (
+                          <div key={index} className="flex">
+                            <div
+                              className="text-xs"
+                              style={{ width: "50px" }}
+                            >{`${item.substring(0, 4)}-${index}`}</div>
+                            <div className="text-xs text-blue-500">
+                              - {item}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <ReactApexChart
-                      options={MSuspectsCategorybarChartOptions}
-                      series={MSuspectsCategorybarChartOptions.series}
-                      type="bar"
-                      height={250}
-                    />
+
+                  <hr />
+
+                  <div className="grid grid-cols-3 gap-2 p-2">
+                    <div className="col-span-2">
+                      <div className="font-bold my-1">
+                        Incidents - Number Of Suspects
+                      </div>
+                      <ReactApexChart
+                        options={MSuspectsCategorybarChartOptions}
+                        series={MSuspectsCategorybarChartOptions.series}
+                        type="bar"
+                        height={250}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <div className="font-bold my-1">Legend</div>
+                      <div>
+                        {numCategoryNames.map((item: string, index: number) => (
+                          <div key={index} className="flex">
+                            <div
+                              className="text-xs"
+                              style={{ width: "50px" }}
+                            >{`${item.substring(0, 4)}-${index}`}</div>
+                            <div className="text-xs text-blue-500">
+                              - {item}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
+
+                  <hr />
                 </div>
               </>
             )}

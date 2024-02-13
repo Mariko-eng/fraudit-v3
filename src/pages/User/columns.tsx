@@ -7,24 +7,24 @@ const userColumnHelper = createColumnHelper<UserModel>();
 
 export const USERCOLUMNS = [
   // Display Column
-  userColumnHelper.display({
-    id: "select",
-    header: (props) => (
-      <input
-        type="checkbox"
-        checked={props.table.getIsAllRowsSelected()}
-        onChange={props.table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: (props) => (
-      <input
-        type="checkbox"
-        checked={props.row.getIsSelected()}
-        disabled={!props.row.getCanSelect()}
-        onChange={props.row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+  // userColumnHelper.display({
+  //   id: "select",
+  //   header: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.table.getIsAllRowsSelected()}
+  //       onChange={props.table.getToggleAllRowsSelectedHandler()}
+  //     />
+  //   ),
+  //   cell: (props) => (
+  //     <input
+  //       type="checkbox"
+  //       checked={props.row.getIsSelected()}
+  //       disabled={!props.row.getCanSelect()}
+  //       onChange={props.row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
 
   userColumnHelper.accessor((row) => `${row.first_name} ${row.last_name}`, {
     id: "Name/s",
@@ -119,6 +119,6 @@ export const USERCOLUMNS = [
     id: "actions",
     header: "Actions",
     footer: "Actions",
-    cell: (props) => <ActionsButton row={props.row} />,
+    cell: (props) => <ActionsButton props={props} />,
   }),
 ];

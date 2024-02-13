@@ -1,17 +1,18 @@
-import { ChangeEvent } from "react";
+// import { ChangeEvent } from "react";
 
 const TransferTableHeader = ({
   totalNo,
-  searchParams,
-  handleSearch,
+  // searchParams,
+  // handleSearch,
 }: {
   totalNo: number;
-  searchParams: string;
-  handleSearch: (value: string) => void;
+  // searchParams: string;
+  // handleSearch: (value: string) => void;
 }) => {
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    handleSearch(event.target.value);
-  };
+
+  // const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   handleSearch(event.target.value);
+  // };
 
 
   return (
@@ -24,7 +25,7 @@ const TransferTableHeader = ({
       </div>
       <hr />
 
-      <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+      {/* <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
         <div className="w-full md:w-1/2">
           <form className="flex items-center">
             <label htmlFor="simple-search" className="sr-only">
@@ -225,7 +226,7 @@ const TransferTableHeader = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

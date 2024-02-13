@@ -11,6 +11,7 @@ import { SfiListModel, SfiModel } from "../../../models/sfi";
 import { IncidentListModel, IncidentModel } from "../../../models/incident";
 import { COLUMNS } from "./columns";
 import { TbArrowsSort } from "react-icons/tb";
+import { CSVLink } from "react-csv";
 
 interface Category {
   category: string;
@@ -21,13 +22,15 @@ interface SubCategory {
 }
 
 const IncidentReports = () => {
+  const state = useAppSelector((store) => store.auth);
+
   const [startDate, setStartDate] = useState("");
+  const [startDateError, setStartDateError] = useState(false);
   const [endDate, setEndDate] = useState("");
+  const [endDateError, setEndDateError] = useState(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-
-  const state = useAppSelector((store) => store.auth);
 
   const [selectedStatus, setSelectedStatus] = useState("");
 
@@ -101,6 +104,18 @@ const IncidentReports = () => {
   }, [state, setSfis]);
 
   const getData = async () => {
+    if(startDate === ""){
+      setStartDateError(true)
+    }else{
+      setStartDateError(false)
+    }
+
+    if(endDate === ""){
+      setEndDateError(true)
+    }else{
+      setEndDateError(false)
+    }
+
     if (startDate !== "" && endDate !== "") {
       setIsLoading(true);
       setError("");
@@ -131,7 +146,7 @@ const IncidentReports = () => {
           },
         });
 
-        console.log(response);
+        // console.log(response);
         const incidentData: IncidentListModel =
           response.data as IncidentListModel;
         setTableData(incidentData.results as IncidentModel[]);
@@ -145,8 +160,8 @@ const IncidentReports = () => {
     }
   };
 
-const [columns, data] = useMemo(() => {
-    let newData : IncidentModel[] = tableData; // Copy the original data to avoid mutating it
+  const [columns, data] = useMemo(() => {
+    let newData: IncidentModel[] = tableData; // Copy the original data to avoid mutating it
 
     if (selectedStatus !== "") {
       newData = newData.filter((item) => item.status === selectedStatus);
@@ -167,8 +182,13 @@ const [columns, data] = useMemo(() => {
     }
 
     return [COLUMNS, newData];
-  }, [tableData, selectedStatus, selectedCategory, selectedSubCategory, selectedSfi]);
-
+  }, [
+    tableData,
+    selectedStatus,
+    selectedCategory,
+    selectedSubCategory,
+    selectedSfi,
+  ]);
 
   const tableInstance = useReactTable({
     columns,
@@ -181,6 +201,35 @@ const [columns, data] = useMemo(() => {
   const headerGroups = tableInstance.getHeaderGroups();
 
   const rowModel = tableInstance.getRowModel();
+
+  const export_data = useMemo(() => {
+    const cols = [
+      "id",
+      "sfi",
+      "status",
+      "classification",
+      "category",
+      "sub category",
+      "currency",
+      "amount",
+      "date",
+    ];
+    const rows = tableData.map((item) => [
+      item.id,
+      item.sfi?.unique_number,
+      item.status,
+      item.classification,
+      item.category,
+      item.sub_category,
+      item.currency,
+      item.actual_amount,
+      item.actual_date,
+    ]);
+
+    return [cols, ...rows];
+  }, [tableData]);
+
+  // console.log(export_data)
 
   return (
     <>
@@ -266,7 +315,7 @@ const [columns, data] = useMemo(() => {
               name="datepicker"
               value={startDate}
               onChange={(event) => setStartDate(event.target.value)}
-              className="px-3 py-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+              className={`px-3 py-2 border ${startDateError ? `border-red-500` : `border-cyan-500`} rounded-md w-full focus:outline-none focus:ring focus:border-blue-300`}
             />
           </div>
           <div className="w-full flex items-center justify-center">
@@ -277,12 +326,12 @@ const [columns, data] = useMemo(() => {
               End Date
             </label>
             <input
-              type="date"
+              type="date" 
               id="end_date"
               name="datepicker"
               value={endDate}
               onChange={(event) => setEndDate(event.target.value)}
-              className="px-3 py-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+              className={`px-3 py-2 border ${endDateError ? `border-red-500` : `border-cyan-500`} rounded-md w-full focus:outline-none focus:ring focus:border-blue-300`}
             />
           </div>
           <div className="w-full flex items-center justify-center">
@@ -398,68 +447,78 @@ const [columns, data] = useMemo(() => {
                 <div className="bg-white dark:bg-gray-800 shadow-md sm:rounded-lg overflow-hidden p-2">
                   {data.length >= 1 && (
                     <div className="mt-2 py-2">
-                        <div className="flex justify-between">
-                        <p className="font-bold" >INCIDENT REPORT</p>
+                      <div className="flex justify-between">
+                        <p className="font-bold">INCIDENT REPORT</p>
                         <div>
-                        <button className="py-1 px-2 border text-sm">Export CSV</button>
-                        <button className="py-1 px-2 ml-1 border text-sm">Export PDF</button>
+                          <CSVLink
+                            data={export_data}
+                            className="py-1 px-2 border text-sm"
+                          >
+                            Export CSV
+                          </CSVLink>
+
+                          {/* <button className="py-1 px-2 border text-sm">Export CSV</button> */}
+                          {/* <button className="py-1 px-2 ml-1 border text-sm">Export PDF</button> */}
                         </div>
-                        </div>
-                        <hr className="my-3" />
-                        <p className="mt-2">No of incidents :: <span className="font-bold">{data.length}</span></p>
-                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                          {headerGroups.map((headerGroup) => (
-                            <tr key={headerGroup.id}>
-                              {headerGroup.headers.map((headerItem) => (
-                                <th
-                                  colSpan={headerItem.colSpan}
-                                  key={headerItem.id}
-                                  className="w-5 p-4"
-                                >
-                                  <div className="flex items-start justify-center">
+                      </div>
+                      <hr className="my-3" />
+                      <p className="mt-2">
+                        No of incidents ::{" "}
+                        <span className="font-bold">{data.length}</span>
+                      </p>
+                      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            {headerGroups.map((headerGroup) => (
+                              <tr key={headerGroup.id}>
+                                {headerGroup.headers.map((headerItem) => (
+                                  <th
+                                    colSpan={headerItem.colSpan}
+                                    key={headerItem.id}
+                                    className="w-5 p-4"
+                                  >
+                                    <div className="flex items-start justify-center">
+                                      {flexRender(
+                                        headerItem.column.columnDef.header,
+                                        headerItem.getContext()
+                                      )}
+                                      {headerItem.column.getCanSort() && (
+                                        <TbArrowsSort
+                                          className="ml-1"
+                                          onClick={() => {
+                                            headerItem.column.toggleSorting();
+                                          }}
+                                        />
+                                      )}
+                                    </div>
+                                  </th>
+                                ))}
+                              </tr>
+                            ))}
+                          </thead>
+                          <tbody>
+                            {rowModel.rows.map((row) => (
+                              <tr
+                                key={row.id}
+                                className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                              >
+                                {row.getVisibleCells().map((cell) => (
+                                  <td
+                                    key={cell.id}
+                                    className="w-5 p-4 items-center"
+                                  >
                                     {flexRender(
-                                      headerItem.column.columnDef.header,
-                                      headerItem.getContext()
+                                      cell.column.columnDef.cell,
+                                      cell.getContext()
                                     )}
-                                    {headerItem.column.getCanSort() && (
-                                      <TbArrowsSort
-                                        className="ml-1"
-                                        onClick={() => {
-                                          headerItem.column.toggleSorting();
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-                                </th>
-                              ))}
-                            </tr>
-                          ))}
-                        </thead>
-                        <tbody>
-                          {rowModel.rows.map((row) => (
-                            <tr
-                              key={row.id}
-                              className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                            >
-                              {row.getVisibleCells().map((cell) => (
-                                <td
-                                  key={cell.id}
-                                  className="w-5 p-4 items-center"
-                                >
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
-                                  )}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                        <tfoot className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></tfoot>
-                      </table>
-                    </div>
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"></tfoot>
+                        </table>
+                      </div>
                     </div>
                   )}
 
